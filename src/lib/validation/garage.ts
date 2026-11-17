@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { plainText, singleLine, uuid } from "./common";
 
-export const GARAGE_MAX_VEHICLES = 5;
+// Plafond technique ; la limite effective (5 par défaut) est le paramètre garage_max_vehicles vérifié en base.
+export const GARAGE_MAX_VEHICLES = 10;
 
 export const garageSchema = z.object({
   garage_id: z.union([uuid, z.literal("")]).transform((v) => (v === "" ? null : v)),
@@ -10,7 +11,7 @@ export const garageSchema = z.object({
   visibility: z.enum(["private", "public"]),
   vehicle_ids: z
     .array(uuid)
-    .max(GARAGE_MAX_VEHICLES, `${GARAGE_MAX_VEHICLES} véhicules maximum.`)
+    .max(GARAGE_MAX_VEHICLES, "Trop de véhicules.")
     .refine((ids) => new Set(ids).size === ids.length, "Un véhicule ne peut apparaître qu'une fois."),
 });
 
