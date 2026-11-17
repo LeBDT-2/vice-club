@@ -462,7 +462,7 @@ export async function submitAnswer(sessionId: string, position: number, input: A
     shareText = buildShareText({ ...s, score: s.score + score }, finalRounds.filter((r) => r.position <= position));
   }
 
-  const { error } = await admin.rpc("game_commit_answer", {
+  const { data: commit, error } = await admin.rpc("game_commit_answer", {
     p_session: s.id,
     p_position: position,
     p_expected_attempts: round.attempts,
@@ -481,6 +481,7 @@ export async function submitAnswer(sessionId: string, position: number, input: A
     if (error.message.includes("session_closed")) return { ok: false, error: "closed" };
     throw new Error("commit_failed");
   }
+  if (commit && typeof commit === "object" && "error" in commit) return { ok: false, error: "expired" };
   return { ok: true, roundComplete, sessionComplete, score, reveal };
 }
 
