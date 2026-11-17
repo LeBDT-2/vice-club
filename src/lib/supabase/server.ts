@@ -12,6 +12,8 @@ export async function createClient() {
   const cookieStore = await cookies();
   const env = publicEnv();
   return createServerClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
+    // Cookies de session marqués Secure dès que le site est servi en HTTPS.
+    cookieOptions: { secure: env.NEXT_PUBLIC_SITE_URL.startsWith("https://") },
     cookies: {
       getAll() {
         return cookieStore.getAll();

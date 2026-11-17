@@ -7,6 +7,7 @@ import { Tag } from "@/components/ui/notice";
 import { requireStaff, roleAtLeast } from "@/lib/auth/viewer";
 import { createClient } from "@/lib/supabase/server";
 import { revokeSanctionAction, setRoleAction } from "@/server/actions/admin-moderation";
+import { nowMs } from "@/lib/utils/clock";
 
 export const metadata = { title: "Fiche compte" };
 
@@ -36,7 +37,7 @@ export default async function UserDetailPage({ params, searchParams }: { params:
   const u = data as unknown as Detail;
   const back = `/admin/utilisateurs/${id}`;
   const isAdmin = roleAtLeast(viewer.role, "admin");
-  const now = Date.now();
+  const now = nowMs();
   const active = u.sanctions.filter((s) => !s.revoked_at && (!s.ends_at || new Date(s.ends_at).getTime() > now));
   const isSelf = viewer.id === u.id;
 

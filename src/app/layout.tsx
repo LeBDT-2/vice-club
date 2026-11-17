@@ -29,6 +29,8 @@ export const metadata: Metadata = {
     siteName: "VICE CLUB",
   },
   twitter: { card: "summary_large_image" },
+  // Préversions et environnements locaux jamais indexés.
+  ...(process.env.APP_ENV === "production" ? {} : { robots: { index: false, follow: false } }),
 };
 
 export const viewport: Viewport = {

@@ -10,6 +10,7 @@ export function createBrowserSupabase() {
   client = createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    { cookieOptions: { secure: (process.env.NEXT_PUBLIC_SITE_URL ?? "").startsWith("https://") } },
   );
   return client;
 }

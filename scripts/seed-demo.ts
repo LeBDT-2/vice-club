@@ -65,7 +65,7 @@ function rng(seed: number) {
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-function demoStamp(w: number, h: number) {
+function demoStamp(w: number) {
   return `<g opacity="0.92"><rect x="${w - 150}" y="16" width="134" height="40" rx="8" fill="#ffd166"/><text x="${w - 83}" y="44" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-weight="900" font-size="24" fill="#1a1230">DÉMO</text></g>`;
 }
 
@@ -118,7 +118,7 @@ function vehicleSvg(o: { shape: Shape; body: string; sky: [string, string]; labe
   <line x1="0" y1="430" x2="960" y2="430" stroke="#2de2d0" stroke-width="3" opacity="0.5"/>
   ${bodies[o.shape]}${wheels}
   <ellipse cx="840" cy="350" rx="18" ry="10" fill="#fff6d6"/><rect x="110" y="350" width="26" height="12" fill="#ff3e8a"/>
-  ${label}${demoStamp(960, 600)}
+  ${label}${demoStamp(960)}
 </svg>`;
 }
 
@@ -168,7 +168,7 @@ function realitySvg(i: number, style: "photo" | "jeu") {
   <defs>${filter}<linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky}"/><stop offset="1" stop-color="#20142e"/></linearGradient></defs>
   <g ${style === "photo" ? 'filter="url(#b)"' : ""}><rect width="960" height="540" fill="url(#g)"/>${shapes}<rect y="430" width="960" height="110" fill="${ground}"/></g>
   <text x="30" y="510" font-family="DejaVu Sans, Arial, sans-serif" font-size="22" fill="#fff" opacity="0.8">Image de démonstration n° ${i + 1}</text>
-  ${demoStamp(960, 540)}
+  ${demoStamp(960)}
 </svg>`;
 }
 
@@ -317,7 +317,7 @@ async function seed() {
     const top = Math.round(Math.min(Math.max(loc.y - ch / 2, 0), MAP_H - ch));
     const crop = await sharp(mapPng).extract({ left, top, width: cw, height: ch }).resize(1280, 720).png().toBuffer();
     const shot = await sharp(crop)
-      .composite([{ input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720">${demoStamp(1280, 720)}</svg>`) }])
+      .composite([{ input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720">${demoStamp(1280)}</svg>`) }])
       .webp({ quality: 80 })
       .toBuffer();
     const path = await upload("game-media", "geo", shot);

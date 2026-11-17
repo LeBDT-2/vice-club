@@ -106,6 +106,74 @@
     background-position: 0 96%;
     padding-bottom: 0.08em;
   }
+  .doc {
+    max-width: 44rem;
+    line-height: 1.65;
+    color: color-mix(in oklab, var(--color-ink) 88%, transparent);
+  }
+  .doc h2 {
+    margin-top: 2.5rem;
+    font-size: 1.45rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--color-ink);
+    scroll-margin-top: 6rem;
+  }
+  .doc h3 {
+    margin-top: 1.6rem;
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .doc p,
+  .doc ul,
+  .doc ol,
+  .doc dl,
+  .doc table {
+    margin-top: 0.85rem;
+  }
+  .doc ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+  .doc ol {
+    list-style: decimal;
+    padding-left: 1.25rem;
+  }
+  .doc li + li {
+    margin-top: 0.35rem;
+  }
+  .doc a {
+    color: var(--color-cyan);
+    text-decoration: underline;
+  }
+  .doc strong {
+    color: var(--color-ink);
+  }
+  .doc table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  .doc th,
+  .doc td {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.6rem 0.5rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .doc th {
+    color: var(--color-ink);
+    font-weight: 700;
+  }
+  .todo {
+    border-radius: 0.35rem;
+    border: 1px dashed color-mix(in oklab, var(--color-gold) 70%, transparent);
+    background: color-mix(in oklab, var(--color-gold) 10%, transparent);
+    padding: 0 0.35rem;
+    color: var(--color-gold);
+    font-weight: 600;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

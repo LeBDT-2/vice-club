@@ -1,0 +1,101 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { LegalPage } from "@/components/legal/legal-page";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+export const metadata: Metadata = {
+  title: "Sources et crédits des médias",
+  description: "Origine, auteur et licence des images utilisées sur VICE CLUB.",
+  alternates: { canonical: "/sources" },
+};
+export const dynamic = "force-dynamic";
+
+type Credit = { source: string; author: string; license: string; ai: boolean; demo: boolean; count: number };
+
+/**
+ * Crédits des médias validés. Les médias des mini-jeux sont regroupés par
+ * source / auteur / licence, sans aperçu ni description, pour ne jamais dévoiler
+ * une réponse.
+ */
+async function loadCredits(): Promise<Credit[]> {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("media_assets")
+    .select("source, author, license, is_ai_generated, is_demo")
+    .eq("validation_status", "approved")
+    .limit(5000);
+  if (error) throw new Error("media_credits");
+  const map = new Map<string, Credit>();
+  for (const m of data ?? []) {
+    const key = [m.source, m.author, m.license, m.is_ai_generated, m.is_demo].join("\u0000");
+    const prev = map.get(key);
+    if (prev) prev.count += 1;
+    else map.set(key, { source: m.source, author: m.author, license: m.license, ai: m.is_ai_generated, demo: m.is_demo, count: 1 });
+  }
+  return [...map.values()].sort((a, b) => Number(a.demo) - Number(b.demo) || b.count - a.count);
+}
+
+export default async function Sources() {
+  const credits = await loadCredits();
+  return (
+    <LegalPage
+      title="Sources et crédits des médias"
+      current="/sources"
+      showMissing={false}
+      intro={
+        <p>
+          Chaque image publiée est vérifiée par l&apos;équipe avant d&apos;apparaître : on note d&apos;où elle vient, qui l&apos;a faite, sous quelle
+          licence, et si elle a été générée par une IA.
+        </p>
+      }
+    >
+      <h2>Illustrations du site</h2>
+      <p>
+        Le logo, les décors (couchers de soleil, palmiers, silhouettes de voitures) et les vignettes des mini-jeux sont des illustrations
+        vectorielles originales créées pour VICE CLUB. Elles ne reprennent aucun visuel officiel des jeux.
+      </p>
+
+      <h2>Médias des mini-jeux et du catalogue</h2>
+      {credits.length === 0 ? (
+        <p>Aucun média n&apos;est encore publié. Cette liste se remplira au fur et à mesure que l&apos;équipe valide des images.</p>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Source</th>
+              <th scope="col">Auteur</th>
+              <th scope="col">Licence</th>
+              <th scope="col" className="text-right">
+                Images
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {credits.map((c) => (
+              <tr key={`${c.source}-${c.author}-${c.license}-${c.ai}-${c.demo}`}>
+                <td>
+                  {c.source}
+                  {c.ai && <span className="ml-2 rounded bg-cyan/15 px-1.5 py-0.5 text-xs text-cyan">générée par IA</span>}
+                  {c.demo && <span className="ml-2 rounded bg-gold/15 px-1.5 py-0.5 text-xs text-gold">démonstration</span>}
+                </td>
+                <td>{c.author}</td>
+                <td>{c.license}</td>
+                <td className="text-right tabular-nums">{c.count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      <p>
+        Les captures de jeux restent la propriété de leurs éditeurs ; elles sont utilisées en petit nombre, à des fins de jeu-questionnaire non
+        commercial, avec mention de la source. Le crédit précis de chaque image de la « Voiture mystère » s&apos;affiche à la fin de la manche.
+      </p>
+
+      <h2>Un média vous appartient ?</h2>
+      <p>
+        Si vous êtes ayant droit et souhaitez une correction de crédit ou un retrait, écrivez-nous via la page{" "}
+        <Link href="/contact?sujet=droits_auteur">Contact</Link> en indiquant la page concernée. Le média est retiré pendant l&apos;examen de la demande.
+      </p>
+    </LegalPage>
+  );
+}

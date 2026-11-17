@@ -4,12 +4,13 @@ import { Tag } from "@/components/ui/notice";
 import { LANGUAGES, PLAY_STYLES } from "@/lib/validation/profile";
 import type { PlayerCardData } from "@/server/data/players";
 import { buttonClass } from "@/components/ui/button";
+import { nowMs } from "@/lib/utils/clock";
 
 const timeFmt = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
 const dayFmt = new Intl.DateTimeFormat("fr-FR", { weekday: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
 
 export function AvailabilityPill({ availability, lastSeenAt }: { availability: PlayerCardData["availability"]; lastSeenAt: string | null }) {
-  const now = Date.now();
+  const now = nowMs();
   if (availability) {
     const start = new Date(availability.startsAt).getTime();
     if (start <= now) {

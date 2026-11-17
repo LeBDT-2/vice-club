@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// eslint-disable-next-line no-control-regex
+ 
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 
 /** Texte brut : supprime les espaces superflus, refuse les caractères de contrôle. */

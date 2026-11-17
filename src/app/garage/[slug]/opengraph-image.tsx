@@ -41,7 +41,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           {vehicles.map((v, i) => (
             <div key={v.id} style={{ display: "flex", flexDirection: "column", width: 200, borderRadius: 18, overflow: "hidden", background: "#10162a", border: "2px solid #2b3354" }}>
               {images[i] ? (
-                // eslint-disable-next-line @next/next/no-img-element -- rendu ImageResponse
+                 
                 <img src={images[i]!} width={200} height={125} style={{ objectFit: "cover" }} alt="" />
               ) : (
                 <div style={{ width: 200, height: 125, background: "#171d33" }} />

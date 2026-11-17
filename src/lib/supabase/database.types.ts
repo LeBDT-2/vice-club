@@ -105,6 +105,20 @@ isOneToOne: true
                   Relationships: [
                     
                   ]
+                },"contact_messages": {
+                  Row: {
+                    "body": string,"category": string,"created_at": string,"handled_at": string | null,"handled_by": string | null,"id": string,"page_url": string | null,"reply_email": string | null,"staff_note": string | null,"status": string,"subject": string,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "body": string,"category": string,"created_at"?: string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"page_url"?: string | null,"reply_email"?: string | null,"staff_note"?: string | null,"status"?: string,"subject": string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "body"?: string,"category"?: string,"created_at"?: string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"page_url"?: string | null,"reply_email"?: string | null,"staff_note"?: string | null,"status"?: string,"subject"?: string,"user_id"?: string | null
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"contact_requests": {
                   Row: {
                     "created_at": string,"id": string,"message": string,"recipient_id": string,"responded_at": string | null,"sender_id": string,"status": string
@@ -797,6 +811,9 @@ isOneToOne: false
                            },
 "respond_contact_request":
 { Args: { "p_accept": boolean,"p_request": string }; Returns: string
+                           },
+"run_maintenance":
+{ Args: Record<PropertyKey, never>; Returns: Json
                            },
 "save_garage":
 { Args: { "p_description": string,"p_garage": string,"p_name": string,"p_vehicle_ids": (string)[],"p_visibility": string }; Returns: string

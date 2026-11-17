@@ -11,6 +11,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const links = [
     { href: "/admin", label: "Tableau de bord" },
     { href: "/admin/signalements", label: "Signalements" },
+    { href: "/admin/contact", label: "Messages de contact" },
     { href: "/admin/utilisateurs", label: "Comptes" },
     ...(isAdmin
       ? [
