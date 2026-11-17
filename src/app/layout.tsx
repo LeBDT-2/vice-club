@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Archivo } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { SiteBackdrop } from "@/components/ambiance/photo";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="fr" className={archivo.variable}>
       <body className="flex min-h-dvh flex-col antialiased">
+        <SiteBackdrop />
         <Header />
         <main id="contenu" className="flex-1">
           {children}

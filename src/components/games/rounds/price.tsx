@@ -14,7 +14,7 @@ function ItemCard({ item, label, price }: { item: Price["items"][number]; label:
     <div className="flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-panel">
       <div className="relative aspect-[16/10] bg-deep">
         {item.imageUrl ? (
-          <img src={item.imageUrl} alt={item.name} className="size-full object-cover" />
+          <img src={item.imageUrl} alt={item.name} className="absolute inset-0 size-full object-cover" />
         ) : (
           <div className="grid size-full place-items-center text-sm text-faint">Pas d&apos;image</div>
         )}

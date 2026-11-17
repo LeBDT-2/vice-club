@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPage } from "@/components/legal/legal-page";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { LICENSE_URL, PHOTOS } from "@/config/photos";
 
 export const metadata: Metadata = {
   title: "Sources et crédits des médias",
@@ -49,11 +50,46 @@ export default async function Sources() {
         </p>
       }
     >
-      <h2>Illustrations du site</h2>
+      <h2 id="photos">Photos d&apos;ambiance du site</h2>
       <p>
-        Le logo, les décors (couchers de soleil, palmiers, silhouettes de voitures) et les vignettes des mini-jeux sont des illustrations
-        vectorielles originales créées pour VICE CLUB. Elles ne reprennent aucun visuel officiel des jeux.
+        Les fonds, bannières et vignettes des mini-jeux sont de vraies photos (Miami Beach, voitures de collection, skateurs), publiées sous
+        licence libre sur Wikimedia Commons. Ce ne sont pas des captures de jeu et aucune ne vient de Rockstar Games. Elles ont été recadrées,
+        redimensionnées et converties en WebP ; sur le site, elles sont assombries et teintées pour la lisibilité du texte. Les photos sous
+        licence CC BY-SA restent disponibles sous la même licence. Le logo est une illustration originale.
       </p>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Photo</th>
+            <th scope="col">Auteur</th>
+            <th scope="col">Licence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.values(PHOTOS).map((p) => {
+            const url = LICENSE_URL[p.license];
+            return (
+              <tr key={p.src}>
+                <td>
+                  <a href={p.sourceUrl} rel="noopener noreferrer" target="_blank">
+                    {p.caption}
+                  </a>
+                </td>
+                <td>{p.author}</td>
+                <td>
+                  {url ? (
+                    <a href={url} rel="noopener noreferrer license" target="_blank">
+                      {p.license}
+                    </a>
+                  ) : (
+                    p.license
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
 
       <h2>Médias des mini-jeux et du catalogue</h2>
       {credits.length === 0 ? (

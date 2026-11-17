@@ -58,4 +58,4 @@ La CI GitHub Actions (`.github/workflows/ci.yml`) exécute tout cela, y compris 
 
 ## Mentions
 
-VICE CLUB n'est ni affilié ni approuvé par Rockstar Games ou Take-Two Interactive. Grand Theft Auto et GTA sont des marques de Take-Two Interactive. Les illustrations du site sont originales ; les médias de jeu sont crédités sur `/sources`.
+VICE CLUB n'est ni affilié ni approuvé par Rockstar Games ou Take-Two Interactive. Grand Theft Auto et GTA sont des marques de Take-Two Interactive. Les photos d'ambiance sont de vraies photos sous licence libre (Wikimedia Commons), jamais des visuels Rockstar ; elles et les médias de jeu sont crédités sur `/sources`.

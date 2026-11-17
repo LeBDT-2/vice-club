@@ -63,7 +63,7 @@ export async function Header() {
     : [];
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line/70 bg-night/85 backdrop-blur supports-[backdrop-filter]:bg-night/70">
+    <header className="sticky top-0 z-30 border-b border-pink/25 bg-night/80 shadow-[0_1px_24px_rgb(255_62_138/0.18)] backdrop-blur-md supports-[backdrop-filter]:bg-night/55">
       <a href="#contenu" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-cyan focus:px-4 focus:py-2 focus:text-night">
         Aller au contenu
       </a>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChallengeScene, GameArt } from "@/components/art/scenes";
+import { Photo } from "@/components/ambiance/photo";
+import { GAME_PHOTO } from "@/config/photos";
 import { Countdown } from "@/components/games/countdown";
 import { buttonClass } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -39,8 +40,9 @@ export default async function DailyChallengePage() {
 
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-line">
-        <ChallengeScene className="absolute inset-0 size-full" />
+      <section className="scanlines relative isolate overflow-hidden border-b border-line">
+        <Photo name="miamiOrange" priority position="center 45%" />
+        <span className="neon-sweep z-10" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-r from-night via-night/85 to-night/30" aria-hidden="true" />
         <div className="container-site relative py-10 sm:py-14">
           <p className="inline-flex rounded-full bg-pink px-3 py-1 text-xs font-bold text-white">{formatParisDate(challenge?.challenge_date ?? new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(now))}</p>
@@ -113,8 +115,8 @@ export default async function DailyChallengePage() {
                       href={`/classements?vue=jour&date=${p.challenge_date}`}
                       className="flex items-center gap-3 rounded-xl border border-line bg-panel p-2 pr-3 hover:border-pink"
                     >
-                      <span className="block h-12 w-10 shrink-0 overflow-hidden rounded-lg">
-                        <GameArt kind={MINI_GAMES.find((g) => g.kind === p.game_kind)?.art ?? ""} className="size-full" />
+                      <span className="relative block h-12 w-10 shrink-0 overflow-hidden rounded-lg">
+                        <Photo name={GAME_PHOTO[MINI_GAMES.find((g) => g.kind === p.game_kind)?.art ?? "garage"]} sizes="40px" />
                       </span>
                       <span>
                         <span className="block text-sm font-semibold first-letter:uppercase">{formatParisDate(p.challenge_date)}</span>

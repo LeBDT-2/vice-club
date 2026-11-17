@@ -1,15 +1,28 @@
 import Link from "next/link";
-import { GameArt } from "@/components/art/scenes";
+import { Photo } from "@/components/ambiance/photo";
+import { TiltCard } from "@/components/ambiance/tilt-card";
+import { GAME_PHOTO, GAME_PHOTO_POSITION } from "@/config/photos";
 import type { MiniGame } from "@/lib/games/catalog";
 
-/** Carte verticale d'un mini-jeu (illustration originale + titre lisible sur fond assombri). */
+/** Carte verticale d'un mini-jeu (photo d'ambiance + titre lisible sur fond assombri), inclinable au survol. */
 export function GameCard({ game, ready, best, size = "md" }: { game: MiniGame; ready: boolean; best?: number; size?: "md" | "lg" }) {
   return (
+    <TiltCard>
     <Link
       href={`/mini-jeux/${game.slug}`}
-      className="group relative flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-[var(--radius-card)] border border-line bg-panel shadow-[var(--shadow-lift)] transition-colors hover:border-pink focus-visible:border-cyan"
+      className="group relative flex aspect-[3/4] h-full flex-col justify-end overflow-hidden rounded-[var(--radius-card)] border border-line bg-panel shadow-[var(--shadow-lift)] transition-colors hover:border-pink focus-visible:border-cyan"
     >
-      <GameArt kind={game.art} className="absolute inset-0 size-full transition-transform duration-500 group-hover:scale-[1.03]" />
+      <Photo
+        name={GAME_PHOTO[game.art]}
+        sizes={size === "lg" ? "(min-width: 1024px) 30rem, 50vw" : "(min-width: 1024px) 15rem, 50vw"}
+        imgClassName={game.art === "mystery" ? "mystery-shot" : "photo-zoom"}
+        position={GAME_PHOTO_POSITION[game.art]}
+      />
+      {game.art === "mystery" && (
+        <span className="display absolute inset-x-0 top-[28%] text-center text-6xl text-pink/90 neon-pink" aria-hidden="true">
+          ?
+        </span>
+      )}
       <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-night via-night/85 to-transparent" aria-hidden="true" />
       <div className="relative p-3 sm:p-4">
         <h3 className={size === "lg" ? "display text-2xl" : "display text-lg sm:text-xl"}>{game.title}</h3>
@@ -20,5 +33,6 @@ export function GameCard({ game, ready, best, size = "md" }: { game: MiniGame; r
         </p>
       </div>
     </Link>
+    </TiltCard>
   );
 }

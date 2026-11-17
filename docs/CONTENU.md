@@ -29,7 +29,7 @@ pnpm seed:demo            # crée ou recrée le contenu de démonstration
 pnpm seed:demo --remove   # le supprime entièrement (lignes et fichiers)
 ```
 
-Contenu créé : un jeu fictif « Jeu de démonstration », deux plateformes « (démo) », 12 véhicules fictifs, 4 propriétés, une carte fictive avec 8 lieux, 3 voitures mystère, 12 images « GTA ou réalité ? » et les défis des 7 prochains jours. Toutes les images sont des illustrations générées par le script et tamponnées **DÉMO** ; tout est marqué `is_demo` et affiché avec un badge « Contenu de démonstration ». Il ne crée **aucun utilisateur, score ni statistique**.
+Contenu créé : un jeu fictif « Jeu de démonstration », deux plateformes « (démo) », 14 véhicules (vrais modèles, prix fictifs), 4 propriétés fictives, une carte fictive avec 8 lieux, 3 voitures mystère, 12 images « GTA ou réalité ? » et les défis des 7 prochains jours. Les images sont de vraies photos sous licence libre de Wikimedia Commons livrées dans `scripts/demo-media/` (crédits dans `credits.json`, enregistrés dans les médias) ; les images « GTA » de la démo sont ces photos retouchées par le script, ce que l'explication de chaque manche indique. Seule la carte est dessinée et tamponnée **DÉMO** ; tout est marqué `is_demo` et affiché avec un badge « Contenu de démonstration ». Il ne crée **aucun utilisateur, score ni statistique**.
 
 Garde-fous : le script refuse `APP_ENV=production` et toute base non locale (sauf `--allow-remote`, à n'utiliser que sur une base de préversion). Avant l'ouverture, `/admin` doit n'afficher aucune alerte « Données de démonstration présentes » (SQL : `select * from public.demo_content_report();`).
 
@@ -39,3 +39,11 @@ Garde-fous : le script refuse `APP_ENV=production` et toute base non locale (sau
 - `/admin/contact` : messages envoyés via le formulaire (questions, droits RGPD, droits d'auteur, contestations). Réponds par e-mail puis marque « traité » avec une note interne. Délai de réponse annoncé pour les demandes RGPD : un mois.
 - `/admin/utilisateurs` : recherche par pseudo (et par e-mail exact pour les administrateurs), historique des sanctions, rôles.
 - Demande d'ayant droit sur un média : passe immédiatement en brouillon (ou archive) les éléments qui l'utilisent et marque le média « refusé », vérifie, puis corrige le crédit ou retire l'image.
+
+## Photos d'ambiance du site
+
+Les fonds, bannières et vignettes des mini-jeux sont listés dans `src/config/photos.ts` (fichiers dans `public/ambiance/`). Pour en ajouter ou en remplacer une :
+
+1. Choisir une photo sous licence libre (CC0, domaine public, CC BY ou CC BY-SA) sur Wikimedia Commons, jamais une capture de jeu ni une image trouvée au hasard.
+2. La convertir en WebP de 1920 px de large au plus (par exemple `sharp`), la déposer dans `public/ambiance/`.
+3. Ajouter son entrée (auteur, licence, lien vers la page Commons, texte alternatif, légende) dans `src/config/photos.ts`. Elle apparaît alors automatiquement sur `/sources`.

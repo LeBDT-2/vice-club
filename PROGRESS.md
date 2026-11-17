@@ -6,7 +6,7 @@ Statut : **application complète en local, testée, prête à être déployée. 
 
 ## 1. Implémenté et testé
 
-Vérifié par tests automatisés, en local et dans la CI GitHub Actions (au vert sur `main`) : 48 tests unitaires, 30 tests d'intégration sur base Supabase locale, 17 tests de bout en bout Playwright exécutés aussi sur le build de production.
+Vérifié par tests automatisés, en local et dans la CI GitHub Actions : 48 tests unitaires, 30 tests d'intégration sur base Supabase locale, 19 tests de bout en bout Playwright exécutés aussi sur le build de production.
 
 | Domaine | Ce qui est vérifié | Où |
 | --- | --- | --- |
@@ -21,9 +21,14 @@ Vérifié par tests automatisés, en local et dans la CI GitHub Actions (au vert
 | Mini-jeux | partie complète au clavier en visiteur, aucune réponse dans le HTML, partie et images d'autrui en 404 | `tests/e2e/games.spec.ts` |
 | Conservation | purge des parties invitées anciennes | `tests/db/daily-maintenance.test.ts` |
 | Mobile et accessibilité | aucune page publique ne déborde à 412 px, menu mobile au clavier, lien d'évitement | `tests/e2e/responsive.spec.ts` |
+| Ambiance (refonte du 17 novembre) | diaporama de l'accueil avec pause, échauffement « Devine la voiture », crédits des photos publiés | `tests/e2e/home.spec.ts` |
 | Logique pure | scores des 4 jeux, minuit de Paris y compris changements d'heure, redirections sûres, validations | `tests/unit/*` |
 
 Vérifié manuellement en local (navigateur automatisé, sans test permanent) : les 4 jeux à score en compte et en visiteur, rejouer le défi du jour renvoie la même partie, classement du jour et du mois, garage (création, page publique, image de partage), double authentification de l'administration, création et publication d'un défi, refus d'un SVG en import admin, validation de média, journal d'audit, formulaire de contact et boîte de réception admin, pages légales sur mobile.
+
+## Refonte visuelle (17 novembre 2026)
+
+À la demande de l'éditeur : plus aucune illustration vectorielle plate. Fond photo fixe (coucher de soleil et palmiers), accueil en diaporama plein écran (Ocean Drive, Porsche sous la pluie, Countach sous les néons), titre néon animé, bandeau défilant, cartes de mini-jeux photo inclinables au survol, sections qui apparaissent au défilement, mini-jeu d'échauffement « Devine la voiture », bannières photo sur toutes les pages. 27 photos d'ambiance et 26 photos de démonstration, toutes de vraies photos sous licence libre de Wikimedia Commons, créditées sur `/sources`. Animations coupées si le système demande de réduire les animations.
 
 ## 2. Implémenté mais non vérifié dans l'environnement cible (Vercel + Supabase hébergé)
 

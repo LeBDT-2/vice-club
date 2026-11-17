@@ -33,7 +33,7 @@ const groups = [
 
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-line bg-deep">
+    <footer className="relative mt-20 border-t border-pink/25 bg-night/80 backdrop-blur-md">
       <div className="container-site grid gap-10 py-12 md:grid-cols-[1.3fr_repeat(3,1fr)]">
         <div className="max-w-sm">
           <Logo />

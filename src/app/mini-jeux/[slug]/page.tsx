@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { GameArt } from "@/components/art/scenes";
+import { Photo, PhotoCredit } from "@/components/ambiance/photo";
+import { TiltCard } from "@/components/ambiance/tilt-card";
+import { GAME_PHOTO, GAME_PHOTO_POSITION } from "@/config/photos";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { buttonClass } from "@/components/ui/button";
 import { DemoBadge, Notice } from "@/components/ui/notice";
@@ -28,8 +30,19 @@ export default async function MiniGamePage({ params, searchParams }: { params: P
   return (
     <div className="container-site py-8 sm:py-12">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,20rem)_1fr] lg:items-start">
-        <div className="relative mx-auto aspect-[3/4] w-full max-w-xs overflow-hidden rounded-[var(--radius-card)] border border-line">
-          <GameArt kind={game.art} className="size-full" />
+        <div className="mx-auto w-full max-w-xs">
+          <TiltCard>
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[var(--radius-card)] border border-line shadow-[var(--shadow-lift)]">
+              <Photo name={GAME_PHOTO[game.art]} priority sizes="20rem" imgClassName={game.art === "mystery" ? "mystery-shot" : undefined} position={GAME_PHOTO_POSITION[game.art]} />
+              <div className="absolute inset-0 bg-gradient-to-t from-night/70 to-transparent" aria-hidden="true" />
+              {game.art === "mystery" && (
+                <span className="display neon-pink absolute inset-x-0 top-[35%] text-center text-8xl" aria-hidden="true">
+                  ?
+                </span>
+              )}
+            </div>
+          </TiltCard>
+          <PhotoCredit name={GAME_PHOTO[game.art]} className="mt-2 inline-block" />
         </div>
         <div>
           <p className="text-sm">

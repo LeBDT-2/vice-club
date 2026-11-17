@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChallengeScene } from "@/components/art/scenes";
+import { Photo } from "@/components/ambiance/photo";
 import { buttonClass } from "@/components/ui/button";
 import { KIND_LABEL, MINI_GAMES } from "@/lib/games/catalog";
 import type { GameKind } from "@/lib/games/scoring";
@@ -12,12 +12,15 @@ export function ChallengeBanner({ challenge }: { challenge: { game_kind: GameKin
   const reset = nextChallengeReset(now).toISOString();
   const game = challenge ? MINI_GAMES.find((g) => g.kind === challenge.game_kind) : null;
   return (
-    <section aria-labelledby="defi-titre" className="relative overflow-hidden rounded-[var(--radius-card)] border border-line bg-panel">
-      <ChallengeScene className="absolute inset-0 size-full opacity-90" />
+    <section aria-labelledby="defi-titre" className="neon-border relative overflow-hidden rounded-[var(--radius-card)] border border-pink/60 bg-panel">
+      <Photo name="miamiCrepuscule" sizes="(min-width: 1216px) 76rem, 100vw" position="center 70%" />
       <div className="absolute inset-0 bg-gradient-to-r from-night via-night/80 to-transparent" aria-hidden="true" />
       <div className="relative flex flex-col gap-4 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-7">
         <div className="max-w-lg">
-          <p className="inline-flex rounded-full bg-pink px-3 py-1 text-xs font-bold text-white">Le défi du jour</p>
+          <p className="inline-flex items-center gap-2 rounded-full bg-pink px-3 py-1 text-xs font-bold text-white shadow-[0_0_18px_rgb(255_62_138/0.6)]">
+            <span className="live-dot !size-2 !bg-white" aria-hidden="true" />
+            Le défi du jour
+          </p>
           {challenge && game ? (
             <>
               <h2 id="defi-titre" className="display mt-3 text-3xl sm:text-4xl">

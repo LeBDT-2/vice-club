@@ -81,8 +81,8 @@ export default function MentionsLegales() {
 
       <h2>Propriété intellectuelle</h2>
       <p>
-        Le code, la charte graphique et les illustrations originales du site appartiennent à son éditeur. Les médias de jeu (captures,
-        visuels de véhicules) sont utilisés avec la source, l&apos;auteur et la licence indiqués sur la page{" "}
+        Le code, la charte graphique et le logo du site appartiennent à son éditeur. Les photos d&apos;ambiance sont des photos sous licence libre
+        de Wikimedia Commons, et les médias de jeu (captures, visuels de véhicules) sont utilisés avec la source, l&apos;auteur et la licence indiqués sur la page{" "}
         <Link href="/sources">Sources et crédits des médias</Link>. Un ayant droit qui conteste une utilisation peut écrire à <ContactEmail /> :
         le média concerné est retiré pendant l&apos;examen de la demande.
       </p>
