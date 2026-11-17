@@ -763,8 +763,19 @@ isOneToOne: false
 "mod_sanction_user":
 { Args: { "p_duration_hours"?: number,"p_kind": string,"p_reason": string,"p_report"?: string,"p_user": string }; Returns: string
                            },
+"mod_search_users":
+{ Args: { "p_limit"?: number,"p_query": string }; Returns: {
+              "created_at": string,"hidden": boolean,"id": string,"last_seen_at": string,"role": Database["public"]['Enums']["app_role"],"sanctioned": boolean,"username": string
+            }[]
+                           },
+"mod_set_garage_hidden":
+{ Args: { "p_garage": string,"p_hidden": boolean,"p_reason": string,"p_report"?: string }; Returns: undefined
+                           },
 "mod_set_profile_hidden":
 { Args: { "p_hidden": boolean,"p_reason": string,"p_user": string }; Returns: undefined
+                           },
+"mod_user_detail":
+{ Args: { "p_user": string }; Returns: Json
                            },
 "my_conversations":
 { Args: { "p_limit"?: number,"p_offset"?: number }; Returns: {

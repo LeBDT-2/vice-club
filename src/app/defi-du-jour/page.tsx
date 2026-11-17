@@ -117,7 +117,7 @@ export default async function DailyChallengePage() {
                         <GameArt kind={MINI_GAMES.find((g) => g.kind === p.game_kind)?.art ?? ""} className="size-full" />
                       </span>
                       <span>
-                        <span className="block text-sm font-semibold capitalize">{formatParisDate(p.challenge_date)}</span>
+                        <span className="block text-sm font-semibold first-letter:uppercase">{formatParisDate(p.challenge_date)}</span>
                         <span className="block text-xs text-muted">{KIND_LABEL[p.game_kind as GameKind]}</span>
                       </span>
                     </Link>

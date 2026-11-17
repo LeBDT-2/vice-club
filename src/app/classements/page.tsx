@@ -87,7 +87,7 @@ export default async function LeaderboardsPage({ searchParams }: { searchParams:
           ))}
         </nav>
         <div className="mt-5 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-xl font-bold capitalize">
+          <h2 className="text-xl font-bold first-letter:uppercase">
             {view === "jour" ? `${formatParisDate(date)}${challengeKind ? ` · ${KIND_LABEL[challengeKind]}` : ""}` : view === "mois" ? new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric", timeZone: "Europe/Paris" }).format(new Date()) : "Depuis l'ouverture"}
           </h2>
           {view === "jour" && date !== today && (
