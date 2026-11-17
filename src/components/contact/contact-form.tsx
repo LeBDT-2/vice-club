@@ -1,4 +1,5 @@
 "use client";
+import { useKeepValues } from "@/components/ui/use-keep-values";
 
 import { useActionState } from "react";
 import { FormMessage, SelectField, TextArea, TextField } from "@/components/ui/form";
@@ -8,10 +9,11 @@ import { CONTACT_CATEGORIES, type ContactCategory } from "@/lib/validation/conta
 
 export function ContactForm({ signedIn, defaultCategory }: { signedIn: boolean; defaultCategory?: ContactCategory }) {
   const [state, action] = useActionState(sendContactMessageAction, null);
+  const keep = useKeepValues(state);
   if (state?.ok) return <FormMessage state={state} />;
   const err = state?.fieldErrors;
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <FormMessage state={state} />
       <SelectField label="Sujet" name="category" id="contact-category" defaultValue={defaultCategory ?? ""} errors={err?.category} required>
         <option value="" disabled>

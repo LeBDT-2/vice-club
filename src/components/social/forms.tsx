@@ -1,5 +1,6 @@
 "use client";
-import { useActionState, useEffect, useRef } from "react";
+import { useKeepValues } from "@/components/ui/use-keep-values";
+import { useActionState, useEffect } from "react";
 import { reportAction, sendContactRequestAction, sendMessageAction } from "@/server/actions/social";
 import { FormMessage, SelectField, TextArea } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -7,9 +8,10 @@ import { REPORT_REASONS } from "@/lib/validation/social";
 
 export function ContactRequestForm({ recipientId, username }: { recipientId: string; username: string }) {
   const [state, action] = useActionState(sendContactRequestAction, null);
+  const keep = useKeepValues(state);
   if (state?.ok) return <FormMessage state={state} />;
   return (
-    <form action={action} className="space-y-3" noValidate>
+    <form {...keep} action={action} className="space-y-3" noValidate>
       <input type="hidden" name="recipient_id" value={recipientId} />
       <FormMessage state={state} />
       <TextArea
@@ -30,6 +32,7 @@ export function ContactRequestForm({ recipientId, username }: { recipientId: str
 
 export function ReportForm({ targetType, targetId, label }: { targetType: "profile" | "message" | "garage"; targetId: string; label: string }) {
   const [state, action] = useActionState(reportAction, null);
+  const keep = useKeepValues(state);
   return (
     <details className="group rounded-xl border border-line bg-deep/60 text-sm open:bg-deep">
       <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 px-3 text-muted hover:text-ink">
@@ -39,7 +42,7 @@ export function ReportForm({ targetType, targetId, label }: { targetType: "profi
         {state?.ok ? (
           <FormMessage state={state} />
         ) : (
-          <form action={action} className="space-y-3" noValidate>
+          <form {...keep} action={action} className="space-y-3" noValidate>
             <input type="hidden" name="target_type" value={targetType} />
             <input type="hidden" name="target_id" value={targetId} />
             <FormMessage state={state} />
@@ -68,12 +71,12 @@ export function ReportForm({ targetType, targetId, label }: { targetType: "profi
 
 export function MessageComposer({ conversationId }: { conversationId: string }) {
   const [state, action] = useActionState(sendMessageAction, null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const { ref: formRef, onSubmit } = useKeepValues(state);
   useEffect(() => {
     if (state?.ok) formRef.current?.reset();
-  }, [state]);
+  }, [state, formRef]);
   return (
-    <form ref={formRef} action={action} className="space-y-2" noValidate>
+    <form ref={formRef} onSubmit={onSubmit} action={action} className="space-y-2" noValidate>
       <input type="hidden" name="conversation_id" value={conversationId} />
       {state && !state.ok && <FormMessage state={state} />}
       <label htmlFor="f-body" className="sr-only">

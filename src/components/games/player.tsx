@@ -20,7 +20,7 @@ export type AnswerPayload =
   | { kind: "higher_lower"; choice: "a" | "b" | "equal" }
   | { kind: "reality"; answer: "gta" | "reality" };
 
-type Reveal = { roundComplete: boolean; sessionComplete: boolean; score: number; reveal: Record<string, unknown> };
+type Reveal = { roundComplete: boolean; sessionComplete: boolean; score: number; reveal: Record<string, unknown>; position: number };
 
 const ERRORS: Record<string, string> = {
   not_found: "Partie introuvable.",
@@ -35,7 +35,10 @@ const ERRORS: Record<string, string> = {
 export function GamePlayer({ state, account }: { state: GameState; account: "guest" | "no_username" | "member" }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [reveal, setReveal] = useState<Reveal | null>(null);
+  const [lastReveal, setReveal] = useState<Reveal | null>(null);
+  // La réponse reste affichée tant que le serveur n'a pas renvoyé la manche suivante :
+  // on ne réaffiche jamais l'ancienne manche pendant le chargement.
+  const reveal = lastReveal && state.status === "active" && lastReveal.position === state.round?.position ? lastReveal : null;
   const [feedback, setFeedback] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const liveRef = useRef<HTMLDivElement>(null);
@@ -62,12 +65,11 @@ export function GamePlayer({ state, account }: { state: GameState; account: "gue
         return;
       }
       setFeedback(null);
-      setReveal(r);
+      setReveal({ ...r, position: state.round!.position });
     });
   };
 
   const next = () => {
-    setReveal(null);
     startTransition(() => router.refresh());
   };
 
@@ -120,7 +122,7 @@ export function GamePlayer({ state, account }: { state: GameState; account: "gue
             {state.kind === "higher_lower" && state.round?.kind === "higher_lower" && <PriceReveal round={state.round} reveal={reveal.reveal} />}
             {state.kind === "reality" && state.round?.kind === "reality" && <RealityReveal round={state.round} reveal={reveal.reveal} />}
             <button ref={continueRef} type="button" onClick={next} disabled={pending} className={buttonClass("primary", "lg")}>
-              {reveal.sessionComplete ? "Voir le résultat" : "Manche suivante"}
+              {pending ? "Chargement…" : reveal.sessionComplete ? "Voir le résultat" : "Manche suivante"}
             </button>
           </section>
         ) : state.status === "active" && state.round ? (

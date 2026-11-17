@@ -1,4 +1,5 @@
 "use client";
+import { useKeepValues } from "@/components/ui/use-keep-values";
 import { useActionState, useState, type ReactNode } from "react";
 import { changeEmailAction, changePasswordAction, deleteAccountAction, startMfaEnrollAction, verifyMfaAction } from "@/server/actions/auth";
 import { FormMessage, TextField } from "@/components/ui/form";
@@ -7,10 +8,11 @@ import { Button } from "@/components/ui/button";
 
 export function ChangePasswordForm({ captcha }: { captcha?: ReactNode }) {
   const [state, action] = useActionState(changePasswordAction, null);
+  const keep = useKeepValues(state);
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <FormMessage state={state} />
-      <TextField label="Mot de passe actuel" name="current_password" type="password" autoComplete="current-password" errors={state?.fieldErrors?.current_password} />
+      <TextField id="pw-current" label="Mot de passe actuel" name="current_password" type="password" autoComplete="current-password" errors={state?.fieldErrors?.current_password} />
       <TextField label="Nouveau mot de passe" name="password" type="password" autoComplete="new-password" errors={state?.fieldErrors?.password} />
       <TextField label="Confirme le nouveau mot de passe" name="password_confirm" type="password" autoComplete="new-password" errors={state?.fieldErrors?.password_confirm} />
       {captcha}
@@ -23,11 +25,12 @@ export function ChangePasswordForm({ captcha }: { captcha?: ReactNode }) {
 
 export function ChangeEmailForm({ captcha }: { captcha?: ReactNode }) {
   const [state, action] = useActionState(changeEmailAction, null);
+  const keep = useKeepValues(state);
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <FormMessage state={state} />
-      <TextField label="Nouvelle adresse e-mail" name="email" type="email" autoComplete="email" errors={state?.fieldErrors?.email} />
-      <TextField label="Mot de passe actuel" name="current_password" type="password" autoComplete="current-password" errors={state?.fieldErrors?.current_password} />
+      <TextField id="email-new" label="Nouvelle adresse e-mail" name="email" type="email" autoComplete="email" errors={state?.fieldErrors?.email} />
+      <TextField id="email-current" label="Mot de passe actuel" name="current_password" type="password" autoComplete="current-password" errors={state?.fieldErrors?.current_password} />
       {captcha}
       <SubmitButton variant="secondary" pendingLabel="…">
         Changer d&apos;adresse
@@ -38,10 +41,11 @@ export function ChangeEmailForm({ captcha }: { captcha?: ReactNode }) {
 
 export function DeleteAccountForm({ captcha }: { captcha?: ReactNode }) {
   const [state, action] = useActionState(deleteAccountAction, null);
+  const keep = useKeepValues(state);
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <FormMessage state={state} />
-      <TextField label="Mot de passe actuel" name="current_password" type="password" autoComplete="current-password" errors={state?.fieldErrors?.current_password} />
+      <TextField id="delete-current" label="Mot de passe actuel" name="current_password" type="password" autoComplete="current-password" errors={state?.fieldErrors?.current_password} />
       <TextField
         label="Tape SUPPRIMER pour confirmer"
         name="confirmation"

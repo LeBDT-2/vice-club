@@ -1,4 +1,5 @@
 "use client";
+import { useKeepValues } from "@/components/ui/use-keep-values";
 import Link from "next/link";
 import { useActionState, type ReactNode } from "react";
 import {
@@ -13,8 +14,9 @@ import { PASSWORD_MIN } from "@/lib/validation/common";
 
 export function SignInForm({ next, captcha }: { next: string; captcha?: ReactNode }) {
   const [state, action] = useActionState(signInAction, null);
+  const keep = useKeepValues(state);
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <input type="hidden" name="next" value={next} />
       <FormMessage state={state} />
       <TextField label="Adresse e-mail" name="email" type="email" autoComplete="email" required errors={state?.fieldErrors?.email} />
@@ -34,9 +36,10 @@ export function SignInForm({ next, captcha }: { next: string; captcha?: ReactNod
 
 export function SignUpForm({ captcha }: { captcha?: ReactNode }) {
   const [state, action] = useActionState(signUpAction, null);
+  const keep = useKeepValues(state);
   if (state?.ok) return <FormMessage state={state} />;
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <FormMessage state={state} />
       <TextField label="Adresse e-mail" name="email" type="email" autoComplete="email" required errors={state?.fieldErrors?.email} hint="Elle reste privée : elle n'apparaît jamais sur ton profil." />
       <TextField
@@ -88,9 +91,10 @@ export function SignUpForm({ captcha }: { captcha?: ReactNode }) {
 
 export function ForgotForm({ captcha }: { captcha?: ReactNode }) {
   const [state, action] = useActionState(forgotPasswordAction, null);
+  const keep = useKeepValues(state);
   if (state?.ok) return <FormMessage state={state} />;
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <FormMessage state={state} />
       <TextField label="Adresse e-mail du compte" name="email" type="email" autoComplete="email" required errors={state?.fieldErrors?.email} />
       {captcha}
@@ -103,8 +107,9 @@ export function ForgotForm({ captcha }: { captcha?: ReactNode }) {
 
 export function ResetForm() {
   const [state, action] = useActionState(resetPasswordAction, null);
+  const keep = useKeepValues(state);
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <FormMessage state={state} />
       <TextField label="Nouveau mot de passe" name="password" type="password" autoComplete="new-password" required errors={state?.fieldErrors?.password} hint={`Au moins ${PASSWORD_MIN} caractères.`} />
       <TextField label="Confirme le nouveau mot de passe" name="password_confirm" type="password" autoComplete="new-password" required errors={state?.fieldErrors?.password_confirm} />

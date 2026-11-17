@@ -1,4 +1,5 @@
 "use client";
+import { useKeepValues } from "@/components/ui/use-keep-values";
 import { useActionState, useState } from "react";
 import {
   chooseUsernameAction,
@@ -20,8 +21,9 @@ import {
 
 export function UsernameForm({ next }: { next: string }) {
   const [state, action] = useActionState(chooseUsernameAction, null);
+  const keep = useKeepValues(state);
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <input type="hidden" name="next" value={next} />
       <FormMessage state={state} />
       <TextField
@@ -63,9 +65,10 @@ export function ProfileForm({
   timezones: string[];
 }) {
   const [state, action] = useActionState(updateProfileAction, null);
+  const keep = useKeepValues(state);
   const gpOptions = Object.fromEntries(gamePlatforms.map((g) => [g.id, g.matchmaking ? g.label : `${g.label} — pas de recherche de partenaires`]));
   return (
-    <form action={action} className="space-y-6" noValidate>
+    <form {...keep} action={action} className="space-y-6" noValidate>
       <FormMessage state={state} />
       <TextArea
         label="Présentation"
@@ -125,8 +128,9 @@ export function ProfileForm({
 
 export function AvatarForm() {
   const [state, action] = useActionState(uploadAvatarAction, null);
+  const keep = useKeepValues(state);
   return (
-    <form action={action} className="space-y-3" noValidate>
+    <form {...keep} action={action} className="space-y-3" noValidate>
       <FormMessage state={state} />
       <div>
         <label htmlFor="f-avatar" className="mb-1.5 block text-sm font-semibold">
@@ -154,8 +158,9 @@ export function AvatarForm() {
 
 export function HandleForm() {
   const [state, action] = useActionState(saveHandleAction, null);
+  const keep = useKeepValues(state);
   return (
-    <form action={action} className="grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end" noValidate>
+    <form {...keep} action={action} className="grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end" noValidate>
       <div className="sm:col-span-4">
         <FormMessage state={state} />
       </div>
@@ -183,12 +188,13 @@ export function HandleForm() {
 
 export function AvailabilityForm({ gamePlatforms }: { gamePlatforms: { id: string; label: string }[] }) {
   const [state, action] = useActionState(setAvailabilityAction, null);
+  const keep = useKeepValues(state);
   const [kind, setKind] = useState<"now" | "planned">("now");
   const [localStart, setLocalStart] = useState("");
   // datetime-local n'a pas de fuseau : on convertit en ISO (UTC) dans le navigateur.
   const isoStart = localStart ? new Date(localStart).toISOString() : "";
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form {...keep} action={action} className="space-y-4" noValidate>
       <FormMessage state={state} />
       <fieldset>
         <legend className="mb-2 text-sm font-semibold">Quand ?</legend>
