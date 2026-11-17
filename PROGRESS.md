@@ -6,7 +6,7 @@ Statut : **application complète en local, testée, prête à être déployée. 
 
 ## 1. Implémenté et testé
 
-Vérifié par tests automatisés (local et CI) : 48 tests unitaires, 30 tests d'intégration sur base Supabase locale, 17 tests de bout en bout Playwright exécutés aussi sur le build de production.
+Vérifié par tests automatisés, en local et dans la CI GitHub Actions (au vert sur `main`) : 48 tests unitaires, 30 tests d'intégration sur base Supabase locale, 17 tests de bout en bout Playwright exécutés aussi sur le build de production.
 
 | Domaine | Ce qui est vérifié | Où |
 | --- | --- | --- |
@@ -34,7 +34,6 @@ Vérifié manuellement en local (navigateur automatisé, sans test permanent) : 
 - Limitation de débit par IP derrière Vercel (`x-forwarded-for`).
 - Image de partage des garages servie depuis le stockage hébergé.
 - Rafraîchissement temps réel de la conversation ouverte (Realtime) : non couvert par un test automatisé.
-- Pipeline CI GitHub Actions : écrit et reproduit localement, à confirmer au premier push.
 
 ## 3. Configuration externe restante
 
