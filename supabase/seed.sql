@@ -1,0 +1,3 @@
+-- Volontairement vide : aucune donnée fictive n'est injectée par les migrations ou le seed SQL.
+-- Le jeu de démonstration (local / préversion uniquement) se charge avec « pnpm seed:demo »
+-- et se retire avec « pnpm seed:demo --remove ». Voir docs/CONTENU.md.

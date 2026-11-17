@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  qualite:
+    name: Types, lint, tests unitaires, build
+    runs-on: ubuntu-latest
+    env:
+      # Valeurs factices : le build ne contacte aucun service.
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder_value
+      SUPABASE_SECRET_KEY: sb_secret_ci_placeholder_value_not_used
+      RATE_LIMIT_SALT: ci-only-salt-ci-only-salt-ci-only-salt-0000
+      APP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+
+  integration:
+    name: RLS et bout en bout (Supabase local)
+    runs-on: ubuntu-latest
+    needs: qualite
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Démarrer Supabase local (migrations appliquées)
+        run: pnpm exec supabase start -x studio,imgproxy,vector,logflare,edge-runtime,supavisor
+
+      - name: Écrire .env.local à partir de supabase status
+        run: |
+          eval "$(pnpm exec supabase status -o env)"
+          {
+            echo "APP_ENV=test"
+            echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000"
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
+            echo "SUPABASE_SECRET_KEY=$SECRET_KEY"
+            echo "RATE_LIMIT_SALT=$(openssl rand -base64 48 | tr -d '\n')"
+            echo "NEXT_PUBLIC_TURNSTILE_SITE_KEY="
+            echo "MAILPIT_URL=$MAILPIT_URL"
+          } > .env.local
+
+      - name: Tests d'intégration RLS
+        run: pnpm test:db
+
+      - name: Contenu de démonstration (base locale uniquement)
+        run: pnpm seed:demo
+
+      - name: Navigateur Playwright
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build et tests de bout en bout
+        run: |
+          set -a; . ./.env.local; set +a
+          pnpm build
+          E2E_WEB_COMMAND="pnpm start" pnpm test:e2e
+
+      - name: Rapport Playwright
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Arrêter Supabase
+        if: always()
+        run: pnpm exec supabase stop --no-backup
