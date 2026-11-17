@@ -1,0 +1,9 @@
+<div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#0f1424;color:#f4f1fb">
+  <h1 style="color:#ff4fa3;font-size:22px;margin:0 0 16px">Réinitialisation du mot de passe</h1>
+  <p>Une demande de réinitialisation a été faite pour ton compte VICE CLUB.</p>
+  <p style="margin:24px 0">
+    <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reinitialiser-mot-de-passe"
+       style="background:#2ee6d6;color:#0b0f1d;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Choisir un nouveau mot de passe</a>
+  </p>
+  <p style="font-size:13px;color:#b9b3cc">Ce lien est utilisable une seule fois et expire au bout d'une heure. Si tu n'as rien demandé, ignore ce message : ton mot de passe ne change pas.</p>
+</div>
