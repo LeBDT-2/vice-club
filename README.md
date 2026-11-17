@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VICE CLUB
 
-## Getting Started
+Site communautaire francophone, gratuit et non officiel autour de GTA :
 
-First, run the development server:
+- **Trouver des joueurs** compatibles (jeu, plateforme, langue, style, créneaux, disponibilités), demandes de contact, messagerie texte après acceptation, blocage et signalement.
+- **Mon garage** : compose un garage virtuel de 5 véhicules dans un budget fictif, garde-le privé ou partage-le.
+- **Cinq mini-jeux** (Garage ultime, Où suis-je ?, Voiture mystère, Plus cher ou moins cher ?, GTA ou réalité ?) et un **défi du jour** avec classements.
+- **Back-office** : modération (signalements, sanctions, masquage), contenu avec provenance des médias, défis du jour, journal d'audit, administration protégée par double authentification.
+
+Les visiteurs peuvent tout consulter et jouer sans compte ; un compte (18 ans et plus) sert à enregistrer ses résultats, apparaître au classement, sauvegarder des garages et contacter des joueurs. Aucune connexion à un compte Rockstar, PSN, Xbox ou Steam n'est jamais demandée.
+
+Stack : Next.js 16 (App Router, TypeScript strict), Tailwind CSS 4, Supabase (Postgres + RLS, Auth, Storage, Realtime), Zod, Vitest, Playwright, déploiement Vercel.
+
+## Démarrer en local
+
+Prérequis : Node 22, pnpm 10, Docker.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm exec supabase start          # Postgres, Auth, Storage, Mailpit ; applique les migrations
+pnpm exec supabase status -o env  # affiche les clés locales
+cp .env.example .env.local        # puis reporte API_URL, PUBLISHABLE_KEY, SECRET_KEY
+                                  # et génère RATE_LIMIT_SALT : openssl rand -base64 48
+pnpm seed:demo                    # facultatif : contenu de démonstration fictif
+pnpm dev                          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- E-mails de confirmation et de réinitialisation : Mailpit sur http://127.0.0.1:54324.
+- Devenir administrateur en local : inscris-toi, puis
+  `psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -c "select private.bootstrap_admin('ton@email.test')"`
+  et active la double authentification sur `/compte/securite/mfa`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Vérifier
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm typecheck && pnpm lint
+pnpm test        # tests unitaires (scores, fuseau de Paris, redirections, validation)
+pnpm test:db     # RLS et règles en base, sur Supabase local
+pnpm test:e2e    # parcours complets dans un navigateur (Playwright)
+pnpm build
+```
 
-## Learn More
+La CI GitHub Actions (`.github/workflows/ci.yml`) exécute tout cela, y compris Supabase local, à chaque push et pull request.
 
-To learn more about Next.js, take a look at the following resources:
+## Documentation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Document | Contenu |
+| --- | --- |
+| [docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md) | Supabase + Vercel pas à pas : migrations, Auth, SMTP, redirections, Turnstile, domaine, premier administrateur, vérifications |
+| [docs/LANCEMENT.md](docs/LANCEMENT.md) | Liste de vérification avant ouverture publique |
+| [docs/CONTENU.md](docs/CONTENU.md) | Ajouter jeux, plateformes, médias, véhicules, lieux, énigmes, défis ; jeu de démonstration ; modération |
+| [docs/JEUX.md](docs/JEUX.md) | Règles, calcul des scores, classements, anti-triche |
+| [docs/PERMISSIONS.md](docs/PERMISSIONS.md) | Rôles, droits, RLS par table, stockage |
+| [docs/SECURITE.md](docs/SECURITE.md) | Modèle de menaces, parades, en-têtes, limites connues |
+| [docs/EXPLOITATION.md](docs/EXPLOITATION.md) | Sauvegarde, restauration, retour arrière, surveillance, coûts |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Organisation du code et choix techniques |
+| [PROGRESS.md](PROGRESS.md) | État d'avancement et limites honnêtes |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Mentions
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+VICE CLUB n'est ni affilié ni approuvé par Rockstar Games ou Take-Two Interactive. Grand Theft Auto et GTA sont des marques de Take-Two Interactive. Les illustrations du site sont originales ; les médias de jeu sont crédités sur `/sources`.
