@@ -3,7 +3,25 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type Database = {
   
-  "public": {
+  "graphql_public": {
+          Tables: {
+            [_ in never]: never
+          }
+          Views: {
+            [_ in never]: never
+          }
+          Functions: {
+            "graphql":
+{ Args: { "extensions"?: Json,"operationName"?: string,"query"?: string,"variables"?: Json }; Returns: Json
+                           }
+          }
+          Enums: {
+            [_ in never]: never
+          }
+          CompositeTypes: {
+            [_ in never]: never
+          }
+        },"public": {
           Tables: {
             "app_settings": {
                   Row: {
@@ -157,14 +175,14 @@ isOneToOne: false
                   ]
                 },"daily_challenges": {
                   Row: {
-                    "challenge_date": string,"created_at": string,"created_by": string | null,"game_kind": string,"id": string,"published_at": string | null,"round_count": number,"status": string,"title": string,"updated_at": string
+                    "challenge_date": string,"created_at": string,"created_by": string | null,"game_kind": string,"id": string,"is_demo": boolean,"published_at": string | null,"round_count": number,"status": string,"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "challenge_date": string,"created_at"?: string,"created_by"?: string | null,"game_kind": string,"id"?: string,"published_at"?: string | null,"round_count": number,"status"?: string,"title"?: string,"updated_at"?: string
+                    "challenge_date": string,"created_at"?: string,"created_by"?: string | null,"game_kind": string,"id"?: string,"is_demo"?: boolean,"published_at"?: string | null,"round_count": number,"status"?: string,"title"?: string,"updated_at"?: string
                   }
                   Update: {
-                    "challenge_date"?: string,"created_at"?: string,"created_by"?: string | null,"game_kind"?: string,"id"?: string,"published_at"?: string | null,"round_count"?: number,"status"?: string,"title"?: string,"updated_at"?: string
+                    "challenge_date"?: string,"created_at"?: string,"created_by"?: string | null,"game_kind"?: string,"id"?: string,"is_demo"?: boolean,"published_at"?: string | null,"round_count"?: number,"status"?: string,"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -704,6 +722,11 @@ isOneToOne: false
 "consume_rate_limit":
 { Args: { "p_bucket": string,"p_max": number,"p_window_seconds": number }; Returns: boolean
                            },
+"demo_content_report":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "demo_rows": number,"table_name": string
+            }[]
+                           },
 "game_commit_answer":
 { Args: { "p_answer": Json,"p_expected_attempts": number,"p_next_round"?: Json,"p_position": number,"p_result": Json,"p_round_complete": boolean,"p_round_score": number,"p_session": string,"p_session_complete": boolean,"p_share_text"?: string }; Returns: Json
                            },
@@ -714,7 +737,7 @@ isOneToOne: false
                            },
 "leaderboard_period":
 { Args: { "p_from": string,"p_limit"?: number,"p_to": string }; Returns: {
-              "avatar_path": string,"best_score": number,"participations": number,"rank": number,"total_score": number,"user_id": string,"username": string
+              "avatar_path": string,"best_points": number,"participations": number,"rank": number,"total_points": number,"user_id": string,"username": string
             }[]
                            },
 "mark_conversation_read":
@@ -746,6 +769,11 @@ isOneToOne: false
 "my_conversations":
 { Args: { "p_limit"?: number,"p_offset"?: number }; Returns: {
               "blocked": boolean,"conversation_id": string,"last_message_at": string,"last_message_mine": boolean,"last_message_preview": string,"other_avatar_path": string,"other_user_id": string,"other_username": string,"unread": boolean
+            }[]
+                           },
+"my_daily_rank":
+{ Args: { "p_date": string }; Returns: {
+              "max_score": number,"participants": number,"rank": number,"score": number
             }[]
                            },
 "public_player_stats":
@@ -898,7 +926,11 @@ export type CompositeTypes<
   : never
 
 export const Constants = {
-  "public": {
+  "graphql_public": {
+          Enums: {
+            
+          }
+        },"public": {
           Enums: {
             "app_role": ["user", "moderator", "admin"],"content_status": ["draft", "published", "archived"]
           }
