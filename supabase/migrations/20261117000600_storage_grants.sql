@@ -125,7 +125,8 @@ grant execute on function
   private.garages_guard(),
   private.garage_vehicles_check(),
   private.garage_touch(),
-  private.setting_int(text, int)
+  private.setting_int(text, int),
+  private.reserved_username(text)
   to anon, authenticated;
 
 grant usage on schema private to service_role;

@@ -17,6 +17,14 @@ const nextConfig: NextConfig = {
   // données privées. (Cache Components désactivé volontairement, cf. docs/ARCHITECTURE.md)
   cacheComponents: false,
   poweredByHeader: false,
+  turbopack: {
+    rules: {
+      "*.css": {
+        loaders: ["@tailwindcss/turbopack"],
+        as: "*.css",
+      },
+    },
+  },
   reactStrictMode: true,
   images: {
     remotePatterns: [

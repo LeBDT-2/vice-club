@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { after } from "next/server";
+import { touchPresence } from "@/server/data/presence";
 import { getViewer, roleAtLeast } from "@/lib/auth/viewer";
 import { createClient } from "@/lib/supabase/server";
 import { signOutAction } from "@/server/actions/auth";
@@ -37,6 +39,8 @@ export async function Header() {
     const supabase = await createClient();
     const { data } = await supabase.rpc("unread_counts");
     if (data?.[0]) counts = data[0];
+    const id = viewer.id;
+    after(() => touchPresence(id));
   }
 
   const signOut = (

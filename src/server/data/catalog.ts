@@ -6,6 +6,7 @@ export type GamePlatformOption = {
   gameId: string;
   gameName: string;
   gameShort: string;
+  platformId: string;
   platformName: string;
   platformShort: string;
   versionLabel: string;
@@ -18,7 +19,7 @@ export async function listGamePlatforms(): Promise<GamePlatformOption[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("game_platforms")
-    .select("id, version_label, matchmaking_enabled, game:games!inner(id, name, short_name, sort_order), platform:platforms!inner(name, short_name, sort_order)")
+    .select("id, version_label, matchmaking_enabled, game:games!inner(id, name, short_name, sort_order), platform:platforms!inner(id, name, short_name, sort_order)")
     .eq("status", "published");
   return (data ?? [])
     .map((gp) => ({
@@ -26,6 +27,7 @@ export async function listGamePlatforms(): Promise<GamePlatformOption[]> {
       gameId: gp.game.id,
       gameName: gp.game.name,
       gameShort: gp.game.short_name,
+      platformId: gp.platform.id,
       platformName: gp.platform.name,
       platformShort: gp.platform.short_name,
       versionLabel: gp.version_label,
