@@ -101,9 +101,10 @@
   }
   .neon-underline {
     background-image: linear-gradient(90deg, var(--color-pink), var(--color-pink-soft));
-    background-size: 100% 0.32em;
+    background-size: 100% 0.12em;
     background-repeat: no-repeat;
-    background-position: 0 92%;
+    background-position: 0 96%;
+    padding-bottom: 0.08em;
   }
 }
 
