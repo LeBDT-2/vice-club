@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Photo } from "@/components/ambiance/photo";
-import { GAME_PHOTO } from "@/config/photos";
+import { GameArt } from "@/components/ambiance/game-art";
 import { Countdown } from "@/components/games/countdown";
 import { buttonClass } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -116,7 +116,7 @@ export default async function DailyChallengePage() {
                       className="flex items-center gap-3 rounded-xl border border-line bg-panel p-2 pr-3 hover:border-pink"
                     >
                       <span className="relative block h-12 w-10 shrink-0 overflow-hidden rounded-lg">
-                        <Photo name={GAME_PHOTO[MINI_GAMES.find((g) => g.kind === p.game_kind)?.art ?? "garage"]} sizes="40px" />
+                        <GameArt art={MINI_GAMES.find((g) => g.kind === p.game_kind)?.art ?? "garage"} sizes="40px" />
                       </span>
                       <span>
                         <span className="block text-sm font-semibold first-letter:uppercase">{formatParisDate(p.challenge_date)}</span>

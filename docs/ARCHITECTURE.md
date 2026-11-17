@@ -23,12 +23,13 @@ Le navigateur ne parle à Supabase que pour Realtime (clé publique, RLS). Toute
 | Dossier | Rôle |
 | --- | --- |
 | `src/app` | Routes. Noms d'URL en français (`/joueurs`, `/mini-jeux`, `/mon-garage`…). `(auth)` regroupe connexion, inscription, mot de passe. |
-| `src/components` | Composants par domaine (`games`, `garage`, `social`, `admin`, `legal`…) et `ui` (boutons, champs, notices). `ambiance/` contient le fond photo, le diaporama de l'accueil, les cartes inclinables et l'échauffement « Devine la voiture ». |
+| `src/components` | Composants par domaine (`games`, `garage`, `social`, `admin`, `legal`…) et `ui` (boutons, champs, notices). `ambiance/` contient le fond photo, le diaporama de l'accueil, les cartes inclinables l'échauffement « Devine la voiture », la section GTA VI et son compte à rebours. |
 | `src/server/actions` | Server Actions (une par intention utilisateur), toutes validées par Zod. |
 | `src/server/data` | Lectures côté serveur (requêtes Supabase typées). |
 | `src/server/games` | Moteur des mini-jeux : création de partie, tirage, contrôle de propriété, révélation. |
 | `src/lib` | Code pur et partagé : règles de score, fuseau de Paris, validation, sécurité (CSP, redirections, limites), environnement. |
 | `src/config/photos.ts` | Photos d'ambiance (fichiers dans `public/ambiance/`) avec auteur, licence et lien Commons, affichés sur `/sources`. |
+| `src/config/gta.ts` | Visuels officiels de GTA VI (fichiers dans `public/gta/`), date de sortie, visuel de chaque mini-jeu ; crédités sur `/sources#gta`. |
 | `src/config/legal.ts` | Informations légales et durées de conservation (seul fichier à compléter pour les pages légales). |
 | `supabase/migrations` | Schéma versionné, appliqué dans l'ordre. Ne jamais modifier une migration déjà appliquée. |
 | `supabase/templates` | Modèles d'e-mails d'authentification. |

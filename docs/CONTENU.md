@@ -29,7 +29,9 @@ pnpm seed:demo            # crée ou recrée le contenu de démonstration
 pnpm seed:demo --remove   # le supprime entièrement (lignes et fichiers)
 ```
 
-Contenu créé : un jeu fictif « Jeu de démonstration », deux plateformes « (démo) », 14 véhicules (vrais modèles, prix fictifs), 4 propriétés fictives, une carte fictive avec 8 lieux, 3 voitures mystère, 12 images « GTA ou réalité ? » et les défis des 7 prochains jours. Les images sont de vraies photos sous licence libre de Wikimedia Commons livrées dans `scripts/demo-media/` (crédits dans `credits.json`, enregistrés dans les médias) ; les images « GTA » de la démo sont ces photos retouchées par le script, ce que l'explication de chaque manche indique. Seule la carte est dessinée et tamponnée **DÉMO** ; tout est marqué `is_demo` et affiché avec un badge « Contenu de démonstration ». Il ne crée **aucun utilisateur, score ni statistique**.
+Contenu créé : le jeu « Grand Theft Auto V » (s'il n'existe pas déjà) avec PS5, Xbox Series X|S et PC, 26 véhicules de GTA V (vrais noms, marques, catégories et prix en jeu relevés sur GTA Wiki le 17 novembre 2026, page source enregistrée dans `price_source`), 5 voitures mystère de GTA V (vue arrière, indices tirés de GTA Wiki), 16 images « GTA ou réalité ? » (8 vraies photos de Miami sous licence libre contre 8 captures officielles de GTA VI) et les défis des 7 prochains jours. Seule la carte « Où suis-je ? » reste fictive, dessinée par le script et tamponnée **DÉMO**. Fichiers : `scripts/gta-media/v/` (captures de GTA V via GTA Wiki), `scripts/gta-media/vi/` (site officiel de GTA VI) et `scripts/demo-media/` (Wikimedia Commons, crédits dans `credits.json`). Tout est marqué `is_demo` et affiché avec un badge « Contenu de démonstration ». Il ne crée **aucun utilisateur, score ni statistique**.
+
+**Visuels Rockstar.** Les captures de GTA V et les visuels officiels de GTA VI restent la propriété de Rockstar Games / Take-Two Interactive. L'éditeur a choisi de les utiliser en citant la source sur chaque image et en acceptant le risque d'une demande de retrait ; en cas de demande, retirer `public/gta/`, `scripts/gta-media/` et passer les médias concernés en « refusé ».
 
 Garde-fous : le script refuse `APP_ENV=production` et toute base non locale (sauf `--allow-remote`, à n'utiliser que sur une base de préversion). Avant l'ouverture, `/admin` doit n'afficher aucune alerte « Données de démonstration présentes » (SQL : `select * from public.demo_content_report();`).
 
@@ -47,3 +49,7 @@ Les fonds, bannières et vignettes des mini-jeux sont listés dans `src/config/p
 1. Choisir une photo sous licence libre (CC0, domaine public, CC BY ou CC BY-SA) sur Wikimedia Commons, jamais une capture de jeu ni une image trouvée au hasard.
 2. La convertir en WebP de 1920 px de large au plus (par exemple `sharp`), la déposer dans `public/ambiance/`.
 3. Ajouter son entrée (auteur, licence, lien vers la page Commons, texte alternatif, légende) dans `src/config/photos.ts`. Elle apparaît alors automatiquement sur `/sources`.
+
+## Visuels GTA VI du site
+
+Le diaporama de l'accueil, la section GTA VI, les vignettes des mini-jeux et les bannières Garage et Mini-jeux utilisent des visuels officiels de GTA VI listés dans `src/config/gta.ts` (fichiers dans `public/gta/`, repris de https://www.rockstargames.com/VI). Ils sont crédités « © Rockstar Games / Take-Two Interactive » et listés sur `/sources#gta`. Le logo GTA VI n'est jamais utilisé comme logo de VICE CLUB. La date de sortie et le compte à rebours viennent de `GTA6_RELEASE`.

@@ -205,24 +205,3 @@ export const PHOTOS = {
 } as const satisfies Record<string, Photo>;
 
 export type PhotoKey = keyof typeof PHOTOS;
-
-/** Photo de chaque mini-jeu (cartes, en-têtes de page). */
-export const GAME_PHOTO: Record<string, PhotoKey> = {
-  garage: "ferrariNoire",
-  where: "colonyHotel",
-  mystery: "nuitPorsche",
-  price: "testarossa",
-  reality: "oceanDrivePluie",
-};
-
-/** Cadrage de chaque photo de mini-jeu dans une carte verticale. */
-export const GAME_PHOTO_POSITION: Record<string, string> = {
-  garage: "center 60%",
-  where: "16% center",
-  mystery: "50% center",
-  price: "38% center",
-  reality: "72% center",
-};
-
-/** Diaporama de l'accueil. */
-export const HERO_SLIDES: PhotoKey[] = ["nuitPorsche", "oceanDrivePluie", "countachNeons", "miamiCrepuscule", "oceanDriveVert"];

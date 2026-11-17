@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Photo } from "@/components/ambiance/photo";
+import { GameArt } from "@/components/ambiance/game-art";
 import { TiltCard } from "@/components/ambiance/tilt-card";
-import { GAME_PHOTO, GAME_PHOTO_POSITION } from "@/config/photos";
 import type { MiniGame } from "@/lib/games/catalog";
 
 /** Carte verticale d'un mini-jeu (photo d'ambiance + titre lisible sur fond assombri), inclinable au survol. */
@@ -12,11 +11,10 @@ export function GameCard({ game, ready, best, size = "md" }: { game: MiniGame; r
       href={`/mini-jeux/${game.slug}`}
       className="group relative flex aspect-[3/4] h-full flex-col justify-end overflow-hidden rounded-[var(--radius-card)] border border-line bg-panel shadow-[var(--shadow-lift)] transition-colors hover:border-pink focus-visible:border-cyan"
     >
-      <Photo
-        name={GAME_PHOTO[game.art]}
+      <GameArt
+        art={game.art}
         sizes={size === "lg" ? "(min-width: 1024px) 30rem, 50vw" : "(min-width: 1024px) 15rem, 50vw"}
         imgClassName={game.art === "mystery" ? "mystery-shot" : "photo-zoom"}
-        position={GAME_PHOTO_POSITION[game.art]}
       />
       {game.art === "mystery" && (
         <span className="display absolute inset-x-0 top-[28%] text-center text-6xl text-pink/90 neon-pink" aria-hidden="true">

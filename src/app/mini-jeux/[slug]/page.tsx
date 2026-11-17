@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Photo, PhotoCredit } from "@/components/ambiance/photo";
 import { TiltCard } from "@/components/ambiance/tilt-card";
-import { GAME_PHOTO, GAME_PHOTO_POSITION } from "@/config/photos";
+import { GameArt, GameArtCredit } from "@/components/ambiance/game-art";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { buttonClass } from "@/components/ui/button";
 import { DemoBadge, Notice } from "@/components/ui/notice";
@@ -33,7 +32,7 @@ export default async function MiniGamePage({ params, searchParams }: { params: P
         <div className="mx-auto w-full max-w-xs">
           <TiltCard>
             <div className="relative aspect-[3/4] overflow-hidden rounded-[var(--radius-card)] border border-line shadow-[var(--shadow-lift)]">
-              <Photo name={GAME_PHOTO[game.art]} priority sizes="20rem" imgClassName={game.art === "mystery" ? "mystery-shot" : undefined} position={GAME_PHOTO_POSITION[game.art]} />
+              <GameArt art={game.art} priority sizes="20rem" imgClassName={game.art === "mystery" ? "mystery-shot" : undefined} />
               <div className="absolute inset-0 bg-gradient-to-t from-night/70 to-transparent" aria-hidden="true" />
               {game.art === "mystery" && (
                 <span className="display neon-pink absolute inset-x-0 top-[35%] text-center text-8xl" aria-hidden="true">
@@ -42,7 +41,7 @@ export default async function MiniGamePage({ params, searchParams }: { params: P
               )}
             </div>
           </TiltCard>
-          <PhotoCredit name={GAME_PHOTO[game.art]} className="mt-2 inline-block" />
+          <GameArtCredit art={game.art} className="mt-2 inline-block" />
         </div>
         <div>
           <p className="text-sm">

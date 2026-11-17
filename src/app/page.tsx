@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { GuessTeaser } from "@/components/ambiance/guess-teaser";
 import { HeroSlideshow } from "@/components/ambiance/hero-slideshow";
-import { Photo, PhotoCredit } from "@/components/ambiance/photo";
-import { HERO_SLIDES, PHOTOS } from "@/config/photos";
+import { GameArt, GameArtCredit } from "@/components/ambiance/game-art";
+import { Photo } from "@/components/ambiance/photo";
+import { GTA6, GTA6_CREDIT } from "@/config/gta";
+import { Gta6Section } from "@/components/ambiance/gta6-section";
 import { ChallengeBanner } from "@/components/games/challenge-banner";
 import { GameCard } from "@/components/games/game-card";
 import { TiltCard } from "@/components/ambiance/tilt-card";
@@ -29,12 +31,18 @@ export default async function Home() {
   const players = [...now.players, ...soon.players].filter((p) => !seen.has(p.id) && seen.add(p.id)).slice(0, 4);
 
   const live = now.total ?? now.players.length;
-  const slides = HERO_SLIDES.map((k) => PHOTOS[k]);
+  const slides = (["jasonLuciaPalmiers", "crepuscule", "plage", "skyline", "cheetah"] as const).map((k) => ({
+    src: GTA6[k].src,
+    caption: `GTA VI : ${GTA6[k].caption}`,
+    credit: GTA6_CREDIT,
+    href: "/sources#gta",
+  }));
   const words = ["Ta", "prochaine", "virée"];
+  const shot = "Capture de GTA V © Rockstar Games, via GTA Wiki";
   const teaser = [
-    { src: PHOTOS.testarossa.src, answer: "Ferrari Testarossa", choices: ["Lamborghini Countach", "Ferrari Testarossa", "Chevrolet Corvette"], credit: `Photo ${PHOTOS.testarossa.author}, ${PHOTOS.testarossa.license}` },
-    { src: PHOTOS.porschePluie.src, answer: "Porsche 911", choices: ["Ferrari F40", "Porsche 911", "DeLorean DMC-12"], credit: `Photo ${PHOTOS.porschePluie.author}, ${PHOTOS.porschePluie.license}` },
-    { src: PHOTOS.ferrariNoire.src, answer: "Ferrari F12", choices: ["Ferrari F12", "Lamborghini Diablo", "Aston Martin DB9"], credit: `Photo ${PHOTOS.ferrariNoire.author}, ${PHOTOS.ferrariNoire.license}` },
+    { src: "/gta/v/t20.webp", answer: "Progen T20", choices: ["Pegassi Osiris", "Progen T20", "Grotti Turismo R"], credit: shot },
+    { src: "/gta/v/coquette-classic.webp", answer: "Invetero Coquette Classic", choices: ["Grotti Stinger", "Invetero Coquette Classic", "Pegassi Monroe"], credit: shot },
+    { src: "/gta/v/dominator.webp", answer: "Vapid Dominator", choices: ["Vapid Dominator", "Bravado Gauntlet", "Declasse Sabre Turbo"], credit: shot },
   ];
   const ticker = [...MINI_GAMES.map((g) => g.title), "Défi du jour", "Classements", "Mon garage"];
 
@@ -102,6 +110,8 @@ export default async function Home() {
       </div>
 
       <div className="container-site space-y-16 py-12">
+        <Gta6Section />
+
         <div className="reveal">
           <ChallengeBanner challenge={challenge} />
         </div>
@@ -192,7 +202,7 @@ export default async function Home() {
         </section>
 
         <section aria-labelledby="garage-titre" className="reveal parallax relative overflow-hidden rounded-[var(--radius-card)] border border-line">
-          <Photo name="countachNeons" sizes="(min-width: 1216px) 76rem, 100vw" position="center 45%" />
+          <GameArt art="garage" sizes="(min-width: 1216px) 76rem, 100vw" />
           <div className="absolute inset-0 bg-gradient-to-r from-night via-night/75 to-transparent" aria-hidden="true" />
           <div className="relative grid min-h-[22rem] gap-6 p-6 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end">
             <div className="max-w-xl self-end">
@@ -209,7 +219,7 @@ export default async function Home() {
               <Link href="/mon-garage" className={buttonClass("primary", "lg")}>
                 Composer mon garage
               </Link>
-              <PhotoCredit name="countachNeons" />
+              <GameArtCredit art="garage" />
             </div>
           </div>
           <span className="neon-sweep" aria-hidden="true" />

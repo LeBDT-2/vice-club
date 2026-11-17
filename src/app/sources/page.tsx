@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LegalPage } from "@/components/legal/legal-page";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { LICENSE_URL, PHOTOS } from "@/config/photos";
+import { GTA6, GTA6_CREDIT, GTA6_SOURCE_URL } from "@/config/gta";
 
 export const metadata: Metadata = {
   title: "Sources et crédits des médias",
@@ -50,10 +51,48 @@ export default async function Sources() {
         </p>
       }
     >
+      <h2 id="gta">Visuels de GTA VI et captures de GTA V</h2>
+      <p>
+        Le diaporama de l&apos;accueil, la section GTA VI et les vignettes des mini-jeux utilisent des visuels officiels de Grand Theft Auto VI
+        ({GTA6_CREDIT}), repris du{" "}
+        <a href={GTA6_SOURCE_URL} rel="noopener noreferrer" target="_blank">
+          site officiel de Rockstar Games
+        </a>
+        . Les véhicules des mini-jeux et du garage sont des captures de GTA V (© Rockstar Games) hébergées par{" "}
+        <a href="https://gta.fandom.com/" rel="noopener noreferrer" target="_blank">
+          GTA Wiki
+        </a>
+        , d&apos;où viennent aussi les prix en jeu ; la page source de chaque véhicule est indiquée dans le tableau des médias plus bas.
+      </p>
+      <p>
+        VICE CLUB est un site de fans non officiel : il n&apos;est ni affilié, ni approuvé, ni parrainé par Rockstar Games ou Take-Two Interactive.
+        Ces visuels restent leur propriété et sont retirés sur simple demande (voir plus bas).
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Visuel GTA VI</th>
+            <th scope="col">Droits</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.values(GTA6).map((v) => (
+            <tr key={v.src}>
+              <td>
+                <a href={GTA6_SOURCE_URL} rel="noopener noreferrer" target="_blank">
+                  {v.caption}
+                </a>
+              </td>
+              <td>{GTA6_CREDIT}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       <h2 id="photos">Photos d&apos;ambiance du site</h2>
       <p>
-        Les fonds, bannières et vignettes des mini-jeux sont de vraies photos (Miami Beach, voitures de collection, skateurs), publiées sous
-        licence libre sur Wikimedia Commons. Ce ne sont pas des captures de jeu et aucune ne vient de Rockstar Games. Elles ont été recadrées,
+        Les autres fonds et bannières sont de vraies photos (Miami Beach, voitures de collection, skateurs), publiées sous licence libre sur
+        Wikimedia Commons. Ce ne sont pas des captures de jeu. Elles ont été recadrées,
         redimensionnées et converties en WebP ; sur le site, elles sont assombries et teintées pour la lisibilité du texte. Les photos sous
         licence CC BY-SA restent disponibles sous la même licence. Le logo est une illustration originale.
       </p>

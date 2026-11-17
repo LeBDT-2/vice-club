@@ -6,11 +6,13 @@
  *
  * - Refuse de s'exécuter si APP_ENV=production.
  * - Refuse une base distante sauf option explicite --allow-remote (préproduction).
- * - Les images sont de vraies photos sous licence libre (Wikimedia Commons), livrées
- *   avec le dépôt dans scripts/demo-media/ (crédits : credits.json) ; seule la carte
- *   « Où suis-je ? » est dessinée par ce script et tamponnée « DÉMO ». Aucune ressource Rockstar.
- * - Les véhicules portent leur vrai nom de modèle, mais les PRIX, propriétés et lieux sont
- *   FICTIFS : ils servent à tester les moteurs de jeu.
+ * - Véhicules de GTA V : vrais noms, marques, catégories et prix en jeu relevés sur GTA Wiki
+ *   (gta.fandom.com, page de chaque véhicule citée en source). Images : captures du jeu
+ *   (© Rockstar Games) hébergées par GTA Wiki, livrées dans scripts/gta-media/v/ (catalog.json).
+ * - « GTA ou réalité ? » : vraies photos de Miami (Wikimedia Commons, scripts/demo-media/) contre
+ *   captures officielles de GTA VI (© Rockstar Games, rockstargames.com/VI, scripts/gta-media/vi/).
+ *   Visuels Rockstar utilisés avec l'accord du porteur du projet, qui accepte le risque de retrait.
+ * - Seule la carte « Où suis-je ? » reste fictive, dessinée par ce script et tamponnée « DÉMO ».
  * - Aucun faux utilisateur, aucun faux score.
  */
 import { randomUUID } from "node:crypto";
@@ -77,16 +79,41 @@ async function upload(bucket: "public-media" | "game-media", folder: string, buf
   return path;
 }
 
-type Credit = { file: string; author: string; license: string; sourceUrl: string };
+type Credit = { author: string; license: string; sourceUrl: string; origin: string; justification: string };
 const MEDIA_DIR = path.join(import.meta.dirname, "demo-media");
-const CREDITS = JSON.parse(readFileSync(path.join(MEDIA_DIR, "credits.json"), "utf8")) as Record<string, Credit>;
+const GTA_DIR = path.join(import.meta.dirname, "gta-media");
+const CREDITS = JSON.parse(readFileSync(path.join(MEDIA_DIR, "credits.json"), "utf8")) as Record<string, { author: string; license: string; sourceUrl: string }>;
 
-/** Photo de démonstration (WebP déjà redimensionné) et son crédit. */
-function demoPhoto(slug: string) {
-  const credit = CREDITS[slug];
-  if (!credit) fail(`Crédit manquant pour scripts/demo-media/${slug}.webp`);
-  return { buffer: readFileSync(path.join(MEDIA_DIR, `${slug}.webp`)), credit };
+/** Photo libre de Wikimedia Commons (WebP déjà redimensionné) et son crédit. */
+function demoPhoto(slug: string): { buffer: Buffer; credit: Credit } {
+  const c = CREDITS[slug];
+  if (!c) fail(`Crédit manquant pour scripts/demo-media/${slug}.webp`);
+  return {
+    buffer: readFileSync(path.join(MEDIA_DIR, `${slug}.webp`)),
+    credit: { ...c, origin: "Wikimedia Commons", justification: "Photo sous licence libre." },
+  };
 }
+
+const ROCKSTAR = "© Rockstar Games / Take-Two Interactive";
+const RISK = "Visuel Rockstar repris avec l'accord du porteur du projet, qui accepte le risque d'une demande de retrait.";
+
+/** Capture de GTA V (via GTA Wiki) d'un véhicule du catalogue. */
+function gta5Shot(file: string, wikiTitle: string): { buffer: Buffer; credit: Credit } {
+  return {
+    buffer: readFileSync(path.join(GTA_DIR, "v", `${file}.webp`)),
+    credit: { author: "Rockstar Games (capture de jeu)", license: ROCKSTAR, sourceUrl: wikiUrl(wikiTitle), origin: "GTA Wiki", justification: RISK },
+  };
+}
+
+/** Capture officielle de GTA VI (site de Rockstar Games). */
+function gta6Shot(file: string): { buffer: Buffer; credit: Credit } {
+  return {
+    buffer: readFileSync(path.join(GTA_DIR, "vi", `${file}.webp`)),
+    credit: { author: "Rockstar Games", license: ROCKSTAR, sourceUrl: "https://www.rockstargames.com/VI", origin: "Site officiel de GTA VI", justification: RISK },
+  };
+}
+
+const wikiUrl = (title: string) => `https://gta.fandom.com/wiki/${encodeURIComponent(title.replaceAll(" ", "_"))}`;
 
 async function insertMedia(bucket: "public-media" | "game-media", path: string, buffer: Buffer, alt: string, credit?: Credit) {
   const meta = await sharp(buffer).metadata();
@@ -95,7 +122,7 @@ async function insertMedia(bucket: "public-media" | "game-media", path: string, 
        usage_justification, is_ai_generated, validation_status, validated_at, is_demo)
      values ($1,$2,'image/webp',$3,$4,$5,$6,$7,$8,$9,$10,false,'approved',now(),true) returning id`,
     credit
-      ? [bucket, path, meta.width, meta.height, buffer.byteLength, alt, `Wikimedia Commons : ${credit.sourceUrl}`, credit.author, credit.license, "Photo sous licence libre utilisée pour la démonstration locale."]
+      ? [bucket, path, meta.width, meta.height, buffer.byteLength, alt, `${credit.origin} : ${credit.sourceUrl}`, credit.author, credit.license, credit.justification]
       : [bucket, path, meta.width, meta.height, buffer.byteLength, alt, DEMO_SOURCE, DEMO_AUTHOR, DEMO_LICENSE, "Contenu de démonstration généré localement."],
   );
   return rows[0].id as string;
@@ -131,29 +158,40 @@ function mapSvg() {
 }
 
 // ------------------------------------------------------------------ données
-const VEHICLES: { slug: string; photo: string; name: string; maker: string; category: string; cost: number; price: number | null; priceType?: string }[] = [
-  { slug: "countach", photo: "countach-rose", name: "Countach", maker: "Lamborghini", category: "super", cost: 4_100_000, price: 3_400_000, priceType: "standard" },
-  { slug: "testarossa", photo: "testarossa-rouge", name: "Testarossa", maker: "Ferrari", category: "super", cost: 3_600_000, price: 2_950_000, priceType: "standard" },
-  { slug: "f40", photo: "ferrari-f40", name: "F40", maker: "Ferrari", category: "super", cost: 4_600_000, price: 3_900_000, priceType: "standard" },
-  { slug: "911", photo: "porsche-pluie", name: "911", maker: "Porsche", category: "sport", cost: 2_400_000, price: 1_850_000, priceType: "standard" },
-  { slug: "f12", photo: "ferrari-noire-pluie", name: "F12berlinetta", maker: "Ferrari", category: "sport", cost: 3_000_000, price: 2_300_000, priceType: "promo" },
-  { slug: "corvette-c3", photo: "corvette-c3", name: "Corvette C3", maker: "Chevrolet", category: "sport", cost: 1_500_000, price: 1_100_000, priceType: "standard" },
-  { slug: "mustang-67", photo: "ford-mustang", name: "Mustang 1967", maker: "Ford", category: "muscle", cost: 1_300_000, price: 780_000, priceType: "standard" },
-  { slug: "eldorado-59", photo: "cadillac-eldorado", name: "Eldorado 1959", maker: "Cadillac", category: "classique", cost: 1_700_000, price: 1_150_000, priceType: "standard" },
-  { slug: "dmc-12", photo: "delorean", name: "DMC-12", maker: "DeLorean", category: "classique", cost: 1_900_000, price: 1_350_000, priceType: "standard" },
-  { slug: "bronco", photo: "ford-bronco", name: "Bronco", maker: "Ford", category: "tout_terrain", cost: 1_100_000, price: 640_000, priceType: "standard" },
-  { slug: "range-rover", photo: "range-rover", name: "Range Rover Classic", maker: "Land Rover", category: "suv", cost: 900_000, price: 600_000, priceType: "standard" },
-  { slug: "ninja-h2", photo: "kawasaki-ninja", name: "Ninja H2", maker: "Kawasaki", category: "moto", cost: 450_000, price: 290_000, priceType: "standard" },
-  { slug: "softail", photo: "harley-davidson", name: "Softail Springer", maker: "Harley-Davidson", category: "moto", cost: 380_000, price: 210_000, priceType: "promo" },
-  { slug: "combi-t1", photo: "vw-combi", name: "Combi T1", maker: "Volkswagen", category: "utilitaire", cost: 250_000, price: null },
+/** Prix relevés sur GTA Wiki le 17 novembre 2026 (boutique en jeu indiquée dans la note). */
+const PRICE_DATE = "2026-11-17";
+type GtaVehicle = { slug: string; wiki: string; name: string; maker: string; category: string; price: number; shop: string };
+const LM = "Legendary Motorsport";
+const SSASA = "Southern San Andreas Super Autos";
+const VEHICLES: GtaVehicle[] = [
+  { slug: "adder", wiki: "Adder", name: "Adder", maker: "Truffade", category: "super", price: 1_000_000, shop: `${LM}, GTA V` },
+  { slug: "zentorno", wiki: "Zentorno", name: "Zentorno", maker: "Pegassi", category: "super", price: 725_000, shop: `${LM}, GTA V` },
+  { slug: "t20", wiki: "T20", name: "T20", maker: "Progen", category: "super", price: 2_200_000, shop: `${LM}, GTA V` },
+  { slug: "entity-xf", wiki: "Entity XF", name: "Entity XF", maker: "Överflöd", category: "super", price: 795_000, shop: `${LM}, GTA V` },
+  { slug: "osiris", wiki: "Osiris", name: "Osiris", maker: "Pegassi", category: "super", price: 1_950_000, shop: `${LM}, GTA V` },
+  { slug: "turismo-r", wiki: "Turismo R", name: "Turismo R", maker: "Grotti", category: "super", price: 500_000, shop: `${LM}, GTA V` },
+  { slug: "vacca", wiki: "Vacca", name: "Vacca", maker: "Pegassi", category: "super", price: 240_000, shop: `${LM}, GTA V` },
+  { slug: "carbonizzare", wiki: "Carbonizzare", name: "Carbonizzare", maker: "Grotti", category: "sport", price: 195_000, shop: `${LM}, GTA Online` },
+  { slug: "massacro", wiki: "Massacro", name: "Massacro", maker: "Dewbauchee", category: "sport", price: 275_000, shop: `${LM}, GTA Online` },
+  { slug: "elegy-rh8", wiki: "Elegy RH8", name: "Elegy RH8", maker: "Annis", category: "sport", price: 95_000, shop: "GTA Online" },
+  { slug: "z-type", wiki: "Z-Type", name: "Z-Type", maker: "Truffade", category: "classique", price: 10_000_000, shop: `${LM}, GTA V` },
+  { slug: "stinger", wiki: "Stinger", name: "Stinger", maker: "Grotti", category: "classique", price: 1_000_000, shop: `${LM}, GTA V` },
+  { slug: "jb-700", wiki: "JB 700", name: "JB 700", maker: "Dewbauchee", category: "classique", price: 475_000, shop: `${LM}, GTA V` },
+  { slug: "monroe", wiki: "Monroe", name: "Monroe", maker: "Pegassi", category: "classique", price: 490_000, shop: `${LM}, GTA V` },
+  { slug: "stirling-gt", wiki: "Stirling GT", name: "Stirling GT", maker: "Benefactor", category: "classique", price: 975_000, shop: `${LM}, GTA V` },
+  { slug: "coquette-classic", wiki: "Coquette Classic", name: "Coquette Classic", maker: "Invetero", category: "classique", price: 665_000, shop: `${LM}, GTA Online` },
+  { slug: "dominator", wiki: "Dominator", name: "Dominator", maker: "Vapid", category: "muscle", price: 35_000, shop: `${SSASA}, GTA Online` },
+  { slug: "gauntlet", wiki: "Gauntlet", name: "Gauntlet", maker: "Bravado", category: "muscle", price: 32_000, shop: `${SSASA}, GTA V` },
+  { slug: "bifta", wiki: "Bifta", name: "Bifta", maker: "BF", category: "tout_terrain", price: 75_000, shop: `${SSASA}, GTA V` },
+  { slug: "rebel", wiki: "Rebel", name: "Rebel", maker: "Karin", category: "tout_terrain", price: 22_000, shop: `${SSASA}, GTA Online` },
+  { slug: "granger", wiki: "Granger", name: "Granger", maker: "Declasse", category: "suv", price: 35_000, shop: `${SSASA}, GTA Online` },
+  { slug: "huntley-s", wiki: "Huntley S", name: "Huntley S", maker: "Enus", category: "suv", price: 195_000, shop: `${LM}, GTA Online` },
+  { slug: "akuma", wiki: "Akuma", name: "Akuma", maker: "Dinka", category: "moto", price: 9_000, shop: `${SSASA}, GTA V` },
+  { slug: "hakuchou", wiki: "Hakuchou", name: "Hakuchou", maker: "Shitzu", category: "moto", price: 82_000, shop: `${SSASA}, GTA Online` },
+  { slug: "bati-801", wiki: "Bati 801", name: "Bati 801", maker: "Pegassi", category: "moto", price: 10_000, shop: `${SSASA}, GTA V` },
+  { slug: "washington", wiki: "Washington", name: "Washington", maker: "Albany", category: "berline", price: 15_000, shop: `${SSASA}, GTA Online` },
 ];
-
-const PROPERTIES = [
-  { slug: "loft-centre", photo: "miami-crepuscule", name: "Loft du Centre", kind: "appartement", location: "Centre", price: 1_200_000 },
-  { slug: "villa-collines", photo: "palmiers-orange", name: "Villa des Collines", kind: "maison", location: "Collines", price: 3_100_000 },
-  { slug: "garage-marina", photo: "miami-orange", name: "Garage de la Marina", kind: "garage", location: "Marina", price: 640_000 },
-  { slug: "club-port", photo: "boulevard-hotel", name: "Club du Port", kind: "club", location: "Port Néon", price: 2_150_000 },
-];
+const VEHICLE_IMAGE: Record<string, string> = { "bati-801": "bati-800" };
 
 const LOCATIONS = [
   { name: "Carrefour du Centre", desc: "Le croisement principal, au pied des tours.", x: 930, y: 790 },
@@ -166,35 +204,47 @@ const LOCATIONS = [
   { name: "Pont sud", desc: "La route qui descend vers le sud.", x: 950, y: 1250 },
 ];
 
+/** Voiture mystère : vue arrière (différente de la photo du catalogue) et indices du plus vague au plus précis. */
 const MYSTERY = [
   {
-    vehicle: "countach",
-    photo: "countach-orange",
-    hints: ["C'est une supercar italienne.", "Elle a été produite de 1974 à 1990.", "Ses portes s'ouvrent en élytre, vers le haut.", "Son moteur est un V12.", "Son constructeur a un taureau pour emblème."],
-    focus: { x: 0.52, y: 0.5 },
+    vehicle: "zentorno",
+    hints: ["C'est une hypercar de la catégorie Super.", "Elle est arrivée avec la mise à jour « High Life ».", "Elle coûte 725 000 $ sur Legendary Motorsport.", "Elle s'inspire de la Lamborghini Sesto Elemento.", "Son constructeur est Pegassi."],
+    focus: { x: 0.5, y: 0.55 },
   },
   {
-    vehicle: "dmc-12",
-    photo: "delorean",
-    hints: ["Sa carrosserie est en acier inoxydable brossé.", "Ses portes s'ouvrent en ailes de mouette.", "Elle a été fabriquée en Irlande du Nord.", "Sa production s'est arrêtée en 1983.", "Le cinéma l'a rendue célèbre en machine à voyager dans le temps."],
-    focus: { x: 0.5, y: 0.62 },
+    vehicle: "jb-700",
+    hints: ["C'est une sportive classique (Sports Classics).", "Son style est typiquement britannique.", "Elle coûte 475 000 $ sur Legendary Motorsport dans GTA V.", "Elle s'inspire de l'Aston Martin DB5, chère à un célèbre agent secret.", "Son constructeur est Dewbauchee."],
+    focus: { x: 0.5, y: 0.55 },
   },
   {
-    vehicle: "mustang-67",
-    photo: "ford-mustang",
-    hints: ["C'est une voiture américaine.", "Elle a lancé la catégorie des « pony cars ».", "Le modèle est apparu en 1964.", "Son emblème est un cheval au galop.", "Son constructeur est Ford."],
-    focus: { x: 0.45, y: 0.55 },
+    vehicle: "adder",
+    hints: ["C'est une hypercar de la catégorie Super.", "Elle coûte pile 1 000 000 $ sur Legendary Motorsport.", "Son constructeur imite une marque de luxe française.", "Elle s'inspire de la Bugatti Veyron 16.4 Super Sport.", "Son constructeur est Truffade."],
+    focus: { x: 0.5, y: 0.55 },
+  },
+  {
+    vehicle: "stirling-gt",
+    hints: ["C'est une sportive classique (Sports Classics).", "C'est un coupé grand tourisme des années 1950.", "Elle coûte 975 000 $ sur Legendary Motorsport.", "Elle s'inspire de la Mercedes-Benz 300 SL.", "Son constructeur est Benefactor."],
+    focus: { x: 0.5, y: 0.55 },
+  },
+  {
+    vehicle: "monroe",
+    hints: ["C'est une sportive classique (Sports Classics).", "Son moteur est placé en position centrale arrière.", "Elle coûte 490 000 $ sur Legendary Motorsport.", "Elle s'inspire de la Lamborghini Miura.", "Son constructeur est Pegassi."],
+    focus: { x: 0.5, y: 0.55 },
   },
 ];
 
-/** « GTA ou réalité ? » : vraies photos, et photos retouchées façon rendu de jeu. */
-const REALITY_REAL = ["ocean-drive-bleu", "ocean-drive-neons", "colony-hotel", "poste-secours", "promeneurs-ocean-drive", "miami-crepuscule"];
-const REALITY_STYLIZED = ["ocean-drive-vert", "boulevard-hotel", "miami-orange", "palmiers-orange", "countach-bleue", "testarossa-rouge"];
-
-/** Effet « rendu de jeu » : couleurs saturées et aplats (filtre médian), sans texture photo. */
-async function stylize(buffer: Buffer) {
-  return sharp(buffer).resize(1280, 720, { fit: "cover" }).median(9).modulate({ saturation: 1.7, brightness: 1.05 }).sharpen({ sigma: 2 }).webp({ quality: 80 }).toBuffer();
-}
+/** « GTA ou réalité ? » : vraies photos de Miami contre captures officielles de GTA VI (Vice City). */
+const REALITY_REAL = ["ocean-drive-bleu", "ocean-drive-neons", "colony-hotel", "poste-secours", "promeneurs-ocean-drive", "miami-crepuscule", "ocean-drive-vert", "boulevard-hotel"];
+const REALITY_GTA6: [file: string, label: string][] = [
+  ["vice-city-crepuscule", "Vice City au crépuscule"],
+  ["vice-city-skyline", "les tours de Vice City"],
+  ["plage-voiture-verte", "une plage de Vice City"],
+  ["grotti-cheetah", "une Grotti Cheetah devant un immeuble Art déco"],
+  ["squalo", "un bateau Squalo devant Vice City"],
+  ["vapid-ganado", "un Vapid Ganado au bord de l'océan"],
+  ["electric-fang", "le salon de tatouage Electric Fang"],
+  ["vapid-stanier", "un taxi Vapid Stanier"],
+];
 
 // ------------------------------------------------------------------ nettoyage
 async function removeDemo() {
@@ -232,54 +282,54 @@ async function removeDemo() {
 // ------------------------------------------------------------------ insertion
 async function seed() {
   const one = async (sql: string, params: unknown[]) => (await db.query(sql, params)).rows[0].id as string;
+  /** Insère une ligne de référence si son slug est libre ; sinon réutilise la ligne existante. */
+  const ref = async (table: "games" | "platforms", slug: string, insert: string, params: unknown[]) => {
+    const created = await db.query(`${insert} on conflict (slug) do nothing returning id`, params);
+    if (created.rowCount) return { id: created.rows[0].id as string, created: true };
+    return { id: await one(`select id from public.${table} where slug = $1`, [slug]), created: false };
+  };
 
-  const gameId = await one(
+  const gta = await ref(
+    "games",
+    "gta-v",
     `insert into public.games (slug, name, short_name, description, status, sort_order, is_demo)
-     values ('demo-vice', 'Jeu de démonstration', 'Démo', 'Jeu fictif servant uniquement à tester VICE CLUB en local.', 'published', 999, true) returning id`,
+     values ('gta-v', 'Grand Theft Auto V', 'GTA V', 'Grand Theft Auto V et GTA Online, de Rockstar Games.', 'published', 10, true)`,
     [],
   );
-  const consoleId = await one(`insert into public.platforms (slug, name, short_name, status, sort_order, is_demo) values ('demo-console', 'Console (démo)', 'Console démo', 'published', 998, true) returning id`, []);
-  const pcId = await one(`insert into public.platforms (slug, name, short_name, status, sort_order, is_demo) values ('demo-pc', 'PC (démo)', 'PC démo', 'published', 999, true) returning id`, []);
-  for (const p of [consoleId, pcId]) {
-    await db.query(
-      `insert into public.game_platforms (game_id, platform_id, version_label, matchmaking_enabled, notes, status, is_demo)
-       values ($1, $2, '', true, 'Combinaison fictive de démonstration.', 'published', true)`,
-      [gameId, p],
-    );
+  const gameId = gta.id;
+  if (gta.created) {
+    for (const [slug, name, short, order] of [
+      ["ps5", "PlayStation 5", "PS5", 10],
+      ["xbox-series", "Xbox Series X|S", "Xbox Series", 20],
+      ["pc", "PC", "PC", 30],
+    ] as const) {
+      const p = await ref(
+        "platforms",
+        slug,
+        `insert into public.platforms (slug, name, short_name, status, sort_order, is_demo) values ($1, $2, $3, 'published', $4, true)`,
+        [slug, name, short, order],
+      );
+      await db.query(
+        `insert into public.game_platforms (game_id, platform_id, version_label, matchmaking_enabled, notes, status, is_demo)
+         values ($1, $2, '', true, '', 'published', true) on conflict do nothing`,
+        [gameId, p.id],
+      );
+    }
   }
 
-  // Véhicules
+  // Véhicules de GTA V : prix réels en jeu, source citée (page GTA Wiki du véhicule).
   const vehicleIds = new Map<string, string>();
   for (const v of VEHICLES) {
-    const { buffer: buf, credit } = demoPhoto(v.photo);
+    const { buffer: buf, credit } = gta5Shot(VEHICLE_IMAGE[v.slug] ?? v.slug, v.wiki);
     const path = await upload("public-media", "vehicles", buf);
-    const mediaId = await insertMedia("public-media", path, buf, `${v.maker} ${v.name}`, credit);
+    const mediaId = await insertMedia("public-media", path, buf, `${v.maker} ${v.name} dans GTA V`, credit);
     const id = await one(
       `insert into public.vehicles (game_id, slug, name, manufacturer, category, game_price, game_price_type, game_price_note,
          price_source, price_verified_at, garage_cost, image_id, status, is_demo)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'published',true) returning id`,
-      [
-        gameId, v.slug, v.name, v.maker, v.category, v.price, v.price === null ? null : v.priceType,
-        v.priceType === "promo" ? "Prix promotionnel fictif" : "",
-        v.price === null ? null : "Prix fictifs du jeu de démonstration", v.price === null ? null : today, v.cost, mediaId,
-      ],
+       values ($1,$2,$3,$4,$5,$6,'standard',$7,$8,$9,$10,$11,'published',true) returning id`,
+      [gameId, v.slug, v.name, v.maker, v.category, v.price, v.shop, `GTA Wiki : ${wikiUrl(v.wiki)}`, PRICE_DATE, v.price, mediaId],
     );
     vehicleIds.set(v.slug, id);
-  }
-
-  // Propriétés
-  const propertyIds: string[] = [];
-  for (const p of PROPERTIES) {
-    const { buffer: buf, credit } = demoPhoto(p.photo);
-    const path = await upload("public-media", "properties", buf);
-    const mediaId = await insertMedia("public-media", path, buf, `${p.name}, propriété fictive de démonstration (photo d'illustration)`, credit);
-    propertyIds.push(
-      await one(
-        `insert into public.properties (game_id, slug, name, kind, location_label, game_price, game_price_type, price_source, price_verified_at, image_id, status, is_demo)
-         values ($1,$2,$3,$4,$5,$6,'standard','Prix fictifs du jeu de démonstration',$7,$8,'published',true) returning id`,
-        [gameId, p.slug, p.name, p.kind, p.location, p.price, today, mediaId],
-      ),
-    );
   }
 
   // Carte + lieux (Où suis-je ?)
@@ -317,11 +367,12 @@ async function seed() {
   // Voiture mystère : image source SANS nom, variantes générées côté serveur.
   const mysteryIds: string[] = [];
   for (const m of MYSTERY) {
-    const { buffer: photo, credit } = demoPhoto(m.photo);
+    const v = VEHICLES.find((x) => x.slug === m.vehicle)!;
+    const { buffer: photo, credit } = gta5Shot(`${m.vehicle}-rear`, v.wiki);
     const src = await sharp(photo).resize(1200, 750, { fit: "cover" }).png().toBuffer();
     const srcWebp = await sharp(src).webp({ quality: 85 }).toBuffer();
     const srcPath = await upload("game-media", "mystery-src", srcWebp);
-    const srcMedia = await insertMedia("game-media", srcPath, srcWebp, "Source de voiture mystère (démo)", credit);
+    const srcMedia = await insertMedia("game-media", srcPath, srcWebp, "Source de voiture mystère", credit);
     const { stages, reveal } = await buildMysteryVariants(src, m.focus);
     const stagePaths: string[] = [];
     for (const s of stages) stagePaths.push(await upload("game-media", "mystery", s));
@@ -335,21 +386,20 @@ async function seed() {
     );
   }
 
-  // GTA ou réalité ? — vraies photos (réponse « réalité ») et photos retouchées façon jeu (réponse « GTA »).
+  // GTA ou réalité ? — vraies photos de Miami (réponse « réalité ») et captures officielles de GTA VI (réponse « GTA »).
   const realityIds: string[] = [];
   const realityPlan = [
-    ...REALITY_REAL.map((slug) => ({ slug, answer: "reality" as const })),
-    ...REALITY_STYLIZED.map((slug) => ({ slug, answer: "gta" as const })),
+    ...REALITY_REAL.map((slug) => ({ ...demoPhoto(slug), answer: "reality" as const, label: "" })),
+    ...REALITY_GTA6.map(([file, label]) => ({ ...gta6Shot(file), answer: "gta" as const, label })),
   ];
-  for (const { slug, answer } of realityPlan) {
-    const { buffer: photo, credit } = demoPhoto(slug);
-    const buf = answer === "gta" ? await stylize(photo) : await sharp(photo).resize(1280, 720, { fit: "cover" }).webp({ quality: 80 }).toBuffer();
+  for (const { buffer: photo, credit, answer, label } of realityPlan) {
+    const buf = await sharp(photo).resize(1280, 720, { fit: "cover" }).webp({ quality: 80 }).toBuffer();
     const path = await upload("game-media", "reality", buf);
-    const media = await insertMedia("game-media", path, buf, "Image de démonstration", credit);
+    const media = await insertMedia("game-media", path, buf, answer === "gta" ? "Capture de GTA VI" : "Photo de Miami", credit);
     const explanation =
       answer === "reality"
-        ? `Vraie photo de ${credit.author} (${credit.license}, Wikimedia Commons).`
-        : `Contenu de démonstration : photo de ${credit.author} (${credit.license}) retouchée par le script (couleurs saturées, aplats) pour imiter un rendu de jeu. Elle compte comme « capture de jeu » uniquement pour tester le moteur.`;
+        ? `Vraie photo de Miami, par ${credit.author} (${credit.license}, Wikimedia Commons).`
+        : `Capture officielle de GTA VI : ${label}. ${ROCKSTAR}, source : rockstargames.com/VI.`;
     realityIds.push(
       await one(
         `insert into public.reality_items (media_id, answer, explanation, game_id, status, is_demo) values ($1,$2,$3,$4,'published',true) returning id`,
@@ -362,8 +412,7 @@ async function seed() {
   const r = rng(42);
   const pick = <T,>(arr: T[], n: number) => [...arr].sort(() => r() - 0.5).slice(0, n);
   const priced = [
-    ...VEHICLES.filter((v) => v.price !== null && v.priceType === "standard").map((v) => ({ type: "vehicle", id: vehicleIds.get(v.slug)! })),
-    ...propertyIds.map((id) => ({ type: "property", id })),
+    ...VEHICLES.map((v) => ({ type: "vehicle", id: vehicleIds.get(v.slug)! })),
   ];
   const plan: { kind: string; title: string; items: { ref_type: string; ref_id: string; ref_b_type?: string; ref_b_id?: string }[] }[] = [
     { kind: "mystery", title: "La voiture mystère", items: [{ ref_type: "mystery_puzzle", ref_id: mysteryIds[0] }] },
@@ -378,7 +427,7 @@ async function seed() {
     },
     { kind: "reality", title: "GTA ou réalité ?", items: pick(realityIds, 10).map((id) => ({ ref_type: "reality_item", ref_id: id })) },
     { kind: "mystery", title: "La voiture mystère", items: [{ ref_type: "mystery_puzzle", ref_id: mysteryIds[1] }] },
-    { kind: "where", title: "Où suis-je ?", items: pick(locationIds, 5).map((id) => ({ ref_type: "geo_location", ref_id: id })) },
+    { kind: "reality", title: "GTA ou réalité ?", items: pick(realityIds, 10).map((id) => ({ ref_type: "reality_item", ref_id: id })) },
     { kind: "mystery", title: "La voiture mystère", items: [{ ref_type: "mystery_puzzle", ref_id: mysteryIds[2] }] },
   ];
   for (const [d, c] of plan.entries()) {
@@ -390,7 +439,7 @@ async function seed() {
     }
     const cid = await one(
       `insert into public.daily_challenges (challenge_date, game_kind, title, round_count, status, is_demo) values ($1,$2,$3,$4,'draft',true) returning id`,
-      [date, c.kind, `${c.title} (démo)`, c.items.length],
+      [date, c.kind, c.kind === "where" ? `${c.title} (démo)` : c.title, c.items.length],
     );
     for (const [i, it] of c.items.entries()) {
       await db.query(

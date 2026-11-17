@@ -6,7 +6,7 @@ Statut : **application complète en local, testée, prête à être déployée. 
 
 ## 1. Implémenté et testé
 
-Vérifié par tests automatisés, en local et dans la CI GitHub Actions : 48 tests unitaires, 30 tests d'intégration sur base Supabase locale, 19 tests de bout en bout Playwright exécutés aussi sur le build de production.
+Vérifié par tests automatisés, en local et dans la CI GitHub Actions : 48 tests unitaires, 30 tests d'intégration sur base Supabase locale, 20 tests de bout en bout Playwright.
 
 | Domaine | Ce qui est vérifié | Où |
 | --- | --- | --- |
@@ -21,7 +21,7 @@ Vérifié par tests automatisés, en local et dans la CI GitHub Actions : 48 tes
 | Mini-jeux | partie complète au clavier en visiteur, aucune réponse dans le HTML, partie et images d'autrui en 404 | `tests/e2e/games.spec.ts` |
 | Conservation | purge des parties invitées anciennes | `tests/db/daily-maintenance.test.ts` |
 | Mobile et accessibilité | aucune page publique ne déborde à 412 px, menu mobile au clavier, lien d'évitement | `tests/e2e/responsive.spec.ts` |
-| Ambiance (refonte du 17 novembre) | diaporama de l'accueil avec pause, échauffement « Devine la voiture », crédits des photos publiés | `tests/e2e/home.spec.ts` |
+| Ambiance et GTA VI | diaporama de l'accueil avec pause, échauffement « Devine la voiture » sur GTA V, section GTA VI (logo, lien officiel, mention non officiel), crédits GTA et photos publiés | `tests/e2e/home.spec.ts` |
 | Logique pure | scores des 4 jeux, minuit de Paris y compris changements d'heure, redirections sûres, validations | `tests/unit/*` |
 
 Vérifié manuellement en local (navigateur automatisé, sans test permanent) : les 4 jeux à score en compte et en visiteur, rejouer le défi du jour renvoie la même partie, classement du jour et du mois, garage (création, page publique, image de partage), double authentification de l'administration, création et publication d'un défi, refus d'un SVG en import admin, validation de média, journal d'audit, formulaire de contact et boîte de réception admin, pages légales sur mobile.
@@ -29,6 +29,10 @@ Vérifié manuellement en local (navigateur automatisé, sans test permanent) : 
 ## Refonte visuelle (17 novembre 2026)
 
 À la demande de l'éditeur : plus aucune illustration vectorielle plate. Fond photo fixe (coucher de soleil et palmiers), accueil en diaporama plein écran (Ocean Drive, Porsche sous la pluie, Countach sous les néons), titre néon animé, bandeau défilant, cartes de mini-jeux photo inclinables au survol, sections qui apparaissent au défilement, mini-jeu d'échauffement « Devine la voiture », bannières photo sur toutes les pages. 27 photos d'ambiance et 26 photos de démonstration, toutes de vraies photos sous licence libre de Wikimedia Commons, créditées sur `/sources`. Animations coupées si le système demande de réduire les animations.
+
+## GTA V et GTA VI (17 novembre 2026)
+
+À la demande de l'éditeur, qui accepte le risque de retrait : visuels officiels de GTA VI (logo, affiches, captures) sur l'accueil (diaporama, section « Vice City, le retour » avec compte à rebours jusqu'au 19 novembre 2026 et galerie), sur les vignettes des mini-jeux et les bannières. Mini-jeux rebasés sur GTA V : 26 véhicules réels avec prix en jeu sourcés (GTA Wiki), 5 voitures mystère, « GTA ou réalité ? » avec de vraies captures de GTA VI, échauffement « Devine la voiture » sur des voitures de GTA V. Crédits sur `/sources#gta`, mention « site non officiel » conservée. Reste fictif : la carte « Où suis-je ? » (une vraie carte de GTA V avec des lieux repérés est la prochaine étape).
 
 ## 2. Implémenté mais non vérifié dans l'environnement cible (Vercel + Supabase hébergé)
 
@@ -58,8 +62,8 @@ Détail dans [docs/CONTENU.md](docs/CONTENU.md).
 
 - Informations légales dans `src/config/legal.ts` (rien n'a été inventé : statut, nom, adresse ou anonymat d'éditeur non professionnel, directeur de publication, e-mail de contact, région d'hébergement).
 - Catalogue réel : jeux, plateformes, combinaisons avec mise en relation vérifiée (un script de départ en brouillon est fourni ; rien n'est supposé sur le multijoueur ou le jeu croisé de GTA VI).
-- Images avec provenance et licence vérifiées pour les véhicules, propriétés, lieux, voitures mystère et « GTA ou réalité ? ».
-- Prix en jeu sourcés et datés pour « Plus cher ou moins cher ? ».
+- Images avec provenance vérifiée pour les propriétés et les lieux (véhicules, voitures mystère et « GTA ou réalité ? » : fournis par `pnpm seed:demo` à partir de GTA Wiki et du site de Rockstar).
+- Prix en jeu des propriétés (ceux des 26 véhicules de GTA V sont sourcés et datés).
 - Une carte avec ses lieux (et son échelle si elle est mesurée).
 - Les défis du jour des premières semaines.
 

@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import type { Photo } from "@/config/photos";
 
 const DELAY = 7000;
 
@@ -19,7 +18,9 @@ const getReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduc
  * Défilement automatique coupé si l'utilisateur préfère réduire les animations,
  * et toujours un bouton pause (critère WCAG 2.2.2).
  */
-export function HeroSlideshow({ slides }: { slides: Pick<Photo, "src" | "caption" | "author" | "license">[] }) {
+export type Slide = { src: string; caption: string; credit: string; href: string };
+
+export function HeroSlideshow({ slides }: { slides: Slide[] }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const reduced = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => false);
@@ -78,10 +79,10 @@ export function HeroSlideshow({ slides }: { slides: Pick<Photo, "src" | "caption
             </button>
           </div>
           <Link
-            href="/sources#photos"
+            href={current.href}
             className="rounded-md bg-night/55 px-2 py-1 text-[0.7rem] leading-tight text-ink/75 backdrop-blur-sm hover:text-ink"
           >
-            {current.caption} · photo {current.author}, {current.license}
+            {current.caption} · {current.credit}
           </Link>
         </div>
       </div>
