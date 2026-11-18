@@ -53,3 +53,12 @@ Les fonds, bannières et vignettes des mini-jeux sont listés dans `src/config/p
 ## Visuels GTA VI du site
 
 Le diaporama de l'accueil, la section GTA VI, les vignettes des mini-jeux et les bannières Garage et Mini-jeux utilisent des visuels officiels de GTA VI listés dans `src/config/gta.ts` (fichiers dans `public/gta/`, repris de https://www.rockstargames.com/VI). Ils sont crédités « © Rockstar Games / Take-Two Interactive » et listés sur `/sources#gta`. Le logo GTA VI n'est jamais utilisé comme logo de VICE CLUB. La date de sortie et le compte à rebours viennent de `GTA6_RELEASE`.
+
+## Charger le contenu GTA sur la version en ligne
+
+```bash
+pnpm import:gta --dry-run   # affiche ce qui serait importé
+pnpm import:gta             # importe (variables NEXT_PUBLIC_SUPABASE_URL et SUPABASE_SECRET_KEY)
+```
+
+Le script `scripts/import-gta.ts` passe uniquement par l'API HTTPS de Supabase (utile quand le réseau bloque le port 5432). Il importe le jeu GTA V et ses plateformes, les 26 véhicules (prix sourcés), les 5 voitures mystère, les 16 images « GTA ou réalité ? » et les défis des 7 prochains jours, **sans** marque `is_demo` puisqu'il s'agit de vrai contenu. Il peut être relancé sans créer de doublons. La carte « Où suis-je ? » n'est pas importée (elle est encore fictive).

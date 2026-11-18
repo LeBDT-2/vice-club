@@ -11,7 +11,8 @@
     "seed:demo": "tsx scripts/seed-demo.ts",
     "test": "vitest run",
     "test:e2e": "playwright test --trace off",
-    "test:db": "vitest run --config vitest.db.config.mts"
+    "test:db": "vitest run --config vitest.db.config.mts",
+    "import:gta": "tsx scripts/import-gta.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
