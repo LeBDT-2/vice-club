@@ -45,7 +45,7 @@ export const AVATAR_PRESETS: AvatarPreset[] = [
 ];
 
 /** Ids dont l'image est présente dans public/avatars/presets. Mis à jour par scripts/import-avatars.ts. */
-export const AVATAR_READY: readonly string[] = [];
+export const AVATAR_READY: readonly string[] = ["m01", "m02", "m03", "m04", "m05", "m06", "m07", "m08", "m09", "m10", "f01", "f02", "f03", "f04", "f05", "f06", "f07", "f08", "f09", "f10"];
 
 export const PRESET_PREFIX = "preset/";
 
