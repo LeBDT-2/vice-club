@@ -1,9 +1,14 @@
 import Image from "next/image";
 import { publicEnv } from "@/lib/env";
 import { cn } from "@/lib/utils/cn";
+import { PRESET_PREFIX, presetFromPath, presetSrc } from "@/config/avatars";
 
 export function avatarUrl(path: string | null | undefined) {
   if (!path) return null;
+  if (path.startsWith(PRESET_PREFIX)) {
+    const preset = presetFromPath(path);
+    return preset ? presetSrc(preset.id) : null;
+  }
   return `${publicEnv().NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${path}`;
 }
 

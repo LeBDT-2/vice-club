@@ -4,7 +4,8 @@ import { requireProfile } from "@/lib/auth/viewer";
 import { createClient } from "@/lib/supabase/server";
 import { listGamePlatforms } from "@/server/data/catalog";
 import { clearAvailabilityAction, deleteHandleAction, removeAvatarAction } from "@/server/actions/profile";
-import { AvailabilityForm, AvatarForm, HandleForm, ProfileForm } from "@/components/account/profile-forms";
+import { AvailabilityForm, AvatarForm, AvatarPresetForm, HandleForm, ProfileForm } from "@/components/account/profile-forms";
+import { PRESET_PREFIX, readyPresets } from "@/config/avatars";
 import { Avatar } from "@/components/ui/avatar";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
@@ -73,6 +74,16 @@ export default async function EditProfilePage({ searchParams }: { searchParams: 
               </form>
             )}
           </div>
+          {readyPresets().length > 0 && (
+            <div className="mb-5 border-b border-line pb-5">
+              <h3 className="mb-3 text-sm font-bold">Choisis ton personnage</h3>
+              <AvatarPresetForm
+                presets={readyPresets()}
+                current={profile.avatar_path?.startsWith(PRESET_PREFIX) ? profile.avatar_path.slice(PRESET_PREFIX.length) : null}
+              />
+            </div>
+          )}
+          <h3 className="mb-3 text-sm font-bold">Ou envoie ta propre image</h3>
           <AvatarForm />
         </section>
 

@@ -1,7 +1,10 @@
 "use client";
 import { useKeepValues } from "@/components/ui/use-keep-values";
 import { useActionState, useState } from "react";
+import Image from "next/image";
+import { type AvatarPreset, presetSrc } from "@/config/avatars";
 import {
+  chooseAvatarPresetAction,
   chooseUsernameAction,
   saveHandleAction,
   setAvailabilityAction,
@@ -151,6 +154,49 @@ export function AvatarForm() {
       </div>
       <SubmitButton variant="secondary" pendingLabel="Envoi…">
         Mettre à jour l&apos;avatar
+      </SubmitButton>
+    </form>
+  );
+}
+
+/** Grille de personnages tout prêts façon GTA, regroupés par genre. */
+export function AvatarPresetForm({ presets, current }: { presets: AvatarPreset[]; current: string | null }) {
+  const [state, action] = useActionState(chooseAvatarPresetAction, null);
+  const keep = useKeepValues(state);
+  const groups = [
+    ["homme", "Hommes"],
+    ["femme", "Femmes"],
+  ] as const;
+  return (
+    <form {...keep} action={action} className="space-y-4" noValidate>
+      <FormMessage state={state} />
+      {groups.map(([g, title]) => {
+        const list = presets.filter((a) => a.group === g);
+        if (list.length === 0) return null;
+        return (
+          <fieldset key={g}>
+            <legend className="mb-2 text-sm font-semibold">{title}</legend>
+            <div className="grid grid-cols-4 gap-2">
+              {list.map((a) => (
+                <label key={a.id} title={a.label} className="group relative block cursor-pointer">
+                  <input type="radio" name="preset" value={a.id} defaultChecked={current === a.id} className="peer sr-only" />
+                  <Image
+                    src={presetSrc(a.id)}
+                    alt={a.label}
+                    width={96}
+                    height={96}
+                    sizes="4rem"
+                    className="aspect-square w-full rounded-xl border-2 border-line object-cover transition-transform group-hover:scale-105 peer-checked:border-cyan peer-checked:shadow-[0_0_14px_rgb(45_226_208/0.6)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-cyan"
+                  />
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        );
+      })}
+      <FieldError id="f-preset-err" errors={state?.fieldErrors?.preset} />
+      <SubmitButton variant="secondary" pendingLabel="Enregistrement…">
+        Prendre ce personnage
       </SubmitButton>
     </form>
   );

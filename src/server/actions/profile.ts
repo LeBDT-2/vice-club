@@ -12,6 +12,7 @@ import { ImageRejectedError, reencodeImage } from "@/lib/images/process";
 import { type ActionState, formToObject, zodFieldErrors } from "@/lib/validation/common";
 import { availabilitySchema, handleSchema, profileSchema, username as usernameSchema } from "@/lib/validation/profile";
 import { z } from "zod";
+import { PRESET_PREFIX, readyPresets } from "@/config/avatars";
 
 const GENERIC_ERROR: ActionState = { ok: false, message: "L'enregistrement a échoué. Réessaie dans un instant." };
 
@@ -204,6 +205,22 @@ export async function uploadAvatarAction(_prev: ActionState, form: FormData): Pr
   }
   revalidatePath("/", "layout");
   return { ok: true, message: "Avatar mis à jour." };
+}
+
+/** Choix d'un avatar tout prêt : seul un id de la liste validée est accepté. */
+export async function chooseAvatarPresetAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+  const viewer = await requireActive("/compte/profil");
+  const id = form.get("preset");
+  const preset = typeof id === "string" ? readyPresets().find((a) => a.id === id) : undefined;
+  if (!preset) return { ok: false, fieldErrors: { preset: ["Choisis un personnage dans la liste."] } };
+
+  const admin = createAdminClient();
+  const { data: prev } = await admin.from("profiles").select("avatar_path").eq("id", viewer.id).single();
+  const { error } = await admin.from("profiles").update({ avatar_path: `${PRESET_PREFIX}${preset.id}` }).eq("id", viewer.id);
+  if (error) return GENERIC_ERROR;
+  if (prev?.avatar_path?.startsWith(`${viewer.id}/`)) await admin.storage.from("avatars").remove([prev.avatar_path]);
+  revalidatePath("/", "layout");
+  return { ok: true, message: `Avatar choisi : ${preset.label}.` };
 }
 
 export async function removeAvatarAction() {

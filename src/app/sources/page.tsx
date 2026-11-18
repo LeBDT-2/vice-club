@@ -4,6 +4,7 @@ import { LegalPage } from "@/components/legal/legal-page";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { LICENSE_URL, PHOTOS } from "@/config/photos";
 import { GTA6, GTA6_CREDIT, GTA6_SOURCE_URL } from "@/config/gta";
+import { readyPresets } from "@/config/avatars";
 
 export const metadata: Metadata = {
   title: "Sources et crédits des médias",
@@ -129,6 +130,17 @@ export default async function Sources() {
           })}
         </tbody>
       </table>
+
+      {readyPresets().length > 0 && (
+        <>
+          <h2 id="avatars">Avatars tout prêts</h2>
+          <p>
+            Les {readyPresets().length} personnages que les joueurs peuvent choisir comme avatar sont des illustrations générées par une IA pour VICE
+            CLUB, dans un style inspiré des écrans de chargement de GTA. Ce sont des personnages inventés : ils ne représentent ni une personne réelle
+            ni un personnage de Rockstar Games.
+          </p>
+        </>
+      )}
 
       <h2>Médias des mini-jeux et du catalogue</h2>
       {credits.length === 0 ? (
